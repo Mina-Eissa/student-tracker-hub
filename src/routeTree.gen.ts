@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedScheduleRouteImport } from './routes/_authenticated/schedule'
 import { Route as AuthenticatedScoreboardRouteImport } from './routes/_authenticated/scoreboard'
+import { Route as AuthenticatedTagsRouteImport } from './routes/_authenticated/tags'
 import { Route as AuthenticatedSessionSessionIdRouteImport } from './routes/_authenticated/session.$sessionId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -40,6 +41,11 @@ const AuthenticatedScoreboardRoute = AuthenticatedScoreboardRouteImport.update({
   path: '/scoreboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedTagsRoute = AuthenticatedTagsRouteImport.update({
+  id: '/tags',
+  path: '/tags',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSessionSessionIdRoute =
   AuthenticatedSessionSessionIdRouteImport.update({
     id: '/session/$sessionId',
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/schedule': typeof AuthenticatedScheduleRoute
   '/scoreboard': typeof AuthenticatedScoreboardRoute
+  '/tags': typeof AuthenticatedTagsRoute
   '/session/$sessionId': typeof AuthenticatedSessionSessionIdRoute
 }
 export interface FileRoutesByTo {
@@ -59,6 +66,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/schedule': typeof AuthenticatedScheduleRoute
   '/scoreboard': typeof AuthenticatedScoreboardRoute
+  '/tags': typeof AuthenticatedTagsRoute
   '/session/$sessionId': typeof AuthenticatedSessionSessionIdRoute
 }
 export interface FileRoutesById {
@@ -68,13 +76,26 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/schedule': typeof AuthenticatedScheduleRoute
   '/_authenticated/scoreboard': typeof AuthenticatedScoreboardRoute
+  '/_authenticated/tags': typeof AuthenticatedTagsRoute
   '/_authenticated/session/$sessionId': typeof AuthenticatedSessionSessionIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/schedule' | '/scoreboard' | '/session/$sessionId'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/schedule'
+    | '/scoreboard'
+    | '/tags'
+    | '/session/$sessionId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/schedule' | '/scoreboard' | '/session/$sessionId'
+  to:
+    | '/'
+    | '/auth'
+    | '/schedule'
+    | '/scoreboard'
+    | '/tags'
+    | '/session/$sessionId'
   id:
     | '__root__'
     | '/'
@@ -82,6 +103,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/schedule'
     | '/_authenticated/scoreboard'
+    | '/_authenticated/tags'
     | '/_authenticated/session/$sessionId'
   fileRoutesById: FileRoutesById
 }
@@ -128,6 +150,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedScoreboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/tags': {
+      id: '/_authenticated/tags'
+      path: '/tags'
+      fullPath: '/tags'
+      preLoaderRoute: typeof AuthenticatedTagsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/session/$sessionId': {
       id: '/_authenticated/session/$sessionId'
       path: '/session/$sessionId'
@@ -141,12 +170,14 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedScheduleRoute: typeof AuthenticatedScheduleRoute
   AuthenticatedScoreboardRoute: typeof AuthenticatedScoreboardRoute
+  AuthenticatedTagsRoute: typeof AuthenticatedTagsRoute
   AuthenticatedSessionSessionIdRoute: typeof AuthenticatedSessionSessionIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedScheduleRoute: AuthenticatedScheduleRoute,
   AuthenticatedScoreboardRoute: AuthenticatedScoreboardRoute,
+  AuthenticatedTagsRoute: AuthenticatedTagsRoute,
   AuthenticatedSessionSessionIdRoute: AuthenticatedSessionSessionIdRoute,
 }
 
