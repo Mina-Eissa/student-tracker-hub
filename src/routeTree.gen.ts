@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedScheduleRouteImport } from './routes/_authenticated/schedule'
+import { Route as AuthenticatedScoreboardRouteImport } from './routes/_authenticated/scoreboard'
 import { Route as AuthenticatedSessionSessionIdRouteImport } from './routes/_authenticated/session.$sessionId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -34,6 +35,11 @@ const AuthenticatedScheduleRoute = AuthenticatedScheduleRouteImport.update({
   path: '/schedule',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedScoreboardRoute = AuthenticatedScoreboardRouteImport.update({
+  id: '/scoreboard',
+  path: '/scoreboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSessionSessionIdRoute =
   AuthenticatedSessionSessionIdRouteImport.update({
     id: '/session/$sessionId',
@@ -45,12 +51,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/schedule': typeof AuthenticatedScheduleRoute
+  '/scoreboard': typeof AuthenticatedScoreboardRoute
   '/session/$sessionId': typeof AuthenticatedSessionSessionIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/schedule': typeof AuthenticatedScheduleRoute
+  '/scoreboard': typeof AuthenticatedScoreboardRoute
   '/session/$sessionId': typeof AuthenticatedSessionSessionIdRoute
 }
 export interface FileRoutesById {
@@ -59,19 +67,21 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/schedule': typeof AuthenticatedScheduleRoute
+  '/_authenticated/scoreboard': typeof AuthenticatedScoreboardRoute
   '/_authenticated/session/$sessionId': typeof AuthenticatedSessionSessionIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/schedule' | '/session/$sessionId'
+  fullPaths: '/' | '/auth' | '/schedule' | '/scoreboard' | '/session/$sessionId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/schedule' | '/session/$sessionId'
+  to: '/' | '/auth' | '/schedule' | '/scoreboard' | '/session/$sessionId'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/schedule'
+    | '/_authenticated/scoreboard'
     | '/_authenticated/session/$sessionId'
   fileRoutesById: FileRoutesById
 }
@@ -111,6 +121,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedScheduleRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/scoreboard': {
+      id: '/_authenticated/scoreboard'
+      path: '/scoreboard'
+      fullPath: '/scoreboard'
+      preLoaderRoute: typeof AuthenticatedScoreboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/session/$sessionId': {
       id: '/_authenticated/session/$sessionId'
       path: '/session/$sessionId'
@@ -123,11 +140,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedScheduleRoute: typeof AuthenticatedScheduleRoute
+  AuthenticatedScoreboardRoute: typeof AuthenticatedScoreboardRoute
   AuthenticatedSessionSessionIdRoute: typeof AuthenticatedSessionSessionIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedScheduleRoute: AuthenticatedScheduleRoute,
+  AuthenticatedScoreboardRoute: AuthenticatedScoreboardRoute,
   AuthenticatedSessionSessionIdRoute: AuthenticatedSessionSessionIdRoute,
 }
 
