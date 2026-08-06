@@ -412,7 +412,7 @@ function ReasonDialog({
   onSave,
 }: {
   open: boolean;
-  status?: Status;
+  status?: Status | undefined;
   reason: string;
   setReason: (v: string) => void;
   onClose: () => void;

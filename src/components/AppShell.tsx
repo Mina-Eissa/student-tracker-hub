@@ -28,9 +28,9 @@ export function AppShell({
   actions,
 }: {
   title: string;
-  description?: string;
+  description?: string | undefined;
   children: ReactNode;
-  actions?: ReactNode;
+  actions?: ReactNode | undefined;
 }) {
   const isAdmin = useIsAdmin();
   const { data: user } = useSession();
