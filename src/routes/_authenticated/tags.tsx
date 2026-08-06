@@ -81,10 +81,7 @@ function TagsPage() {
           .eq("id", t.id);
         if (error) throw error;
       } else {
-        const { data: u } = await supabase.auth.getUser();
-        const { error } = await supabase
-          .from("behavior_tags")
-          .insert({ name, type, points, created_by: u.user!.id });
+        const { error } = await supabase.from("behavior_tags").insert({ name, type, points });
         if (error) throw error;
       }
     },
