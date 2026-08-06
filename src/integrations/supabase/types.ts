@@ -14,16 +14,366 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      attendance: {
+        Row: {
+          created_at: string
+          id: string
+          reason: string | null
+          recorded_by: string
+          session_date: string
+          session_id: string
+          status: Database["public"]["Enums"]["attendance_status"]
+          student_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reason?: string | null
+          recorded_by?: string
+          session_date?: string
+          session_id: string
+          status?: Database["public"]["Enums"]["attendance_status"]
+          student_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reason?: string | null
+          recorded_by?: string
+          session_date?: string
+          session_id?: string
+          status?: Database["public"]["Enums"]["attendance_status"]
+          student_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bathroom_logs: {
+        Row: {
+          id: string
+          note: string | null
+          occurred_at: string
+          recorded_by: string
+          returned_at: string | null
+          session_id: string | null
+          student_id: string
+        }
+        Insert: {
+          id?: string
+          note?: string | null
+          occurred_at?: string
+          recorded_by?: string
+          returned_at?: string | null
+          session_id?: string | null
+          student_id: string
+        }
+        Update: {
+          id?: string
+          note?: string | null
+          occurred_at?: string
+          recorded_by?: string
+          returned_at?: string | null
+          session_id?: string | null
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bathroom_logs_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bathroom_logs_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      behavior_tags: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          points: number
+          type: Database["public"]["Enums"]["behavior_type"]
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          points?: number
+          type: Database["public"]["Enums"]["behavior_type"]
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          points?: number
+          type?: Database["public"]["Enums"]["behavior_type"]
+        }
+        Relationships: []
+      }
+      behaviors: {
+        Row: {
+          comment: string | null
+          consequence: string | null
+          created_at: string
+          id: string
+          points: number
+          recorded_by: string
+          session_date: string
+          session_id: string | null
+          student_id: string
+          tag_id: string | null
+          type: Database["public"]["Enums"]["behavior_type"]
+        }
+        Insert: {
+          comment?: string | null
+          consequence?: string | null
+          created_at?: string
+          id?: string
+          points?: number
+          recorded_by?: string
+          session_date?: string
+          session_id?: string | null
+          student_id: string
+          tag_id?: string | null
+          type: Database["public"]["Enums"]["behavior_type"]
+        }
+        Update: {
+          comment?: string | null
+          consequence?: string | null
+          created_at?: string
+          id?: string
+          points?: number
+          recorded_by?: string
+          session_date?: string
+          session_id?: string | null
+          student_id?: string
+          tag_id?: string | null
+          type?: Database["public"]["Enums"]["behavior_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "behaviors_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "behaviors_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "behaviors_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "behavior_tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      grades: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      sessions: {
+        Row: {
+          created_at: string
+          day_of_week: number
+          end_time: string
+          grade_id: string
+          id: string
+          room: string | null
+          start_time: string
+          teacher_id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          day_of_week: number
+          end_time: string
+          grade_id: string
+          id?: string
+          room?: string | null
+          start_time: string
+          teacher_id: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          day_of_week?: number
+          end_time?: string
+          grade_id?: string
+          id?: string
+          room?: string | null
+          start_time?: string
+          teacher_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sessions_grade_id_fkey"
+            columns: ["grade_id"]
+            isOneToOne: false
+            referencedRelation: "grades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      students: {
+        Row: {
+          created_at: string
+          full_name: string
+          grade_id: string
+          id: string
+          student_code: string | null
+        }
+        Insert: {
+          created_at?: string
+          full_name: string
+          grade_id: string
+          id?: string
+          student_code?: string | null
+        }
+        Update: {
+          created_at?: string
+          full_name?: string
+          grade_id?: string
+          id?: string
+          student_code?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "students_grade_id_fkey"
+            columns: ["grade_id"]
+            isOneToOne: false
+            referencedRelation: "grades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teacher_grades: {
+        Row: {
+          grade_id: string
+          id: string
+          teacher_id: string
+        }
+        Insert: {
+          grade_id: string
+          id?: string
+          teacher_id: string
+        }
+        Update: {
+          grade_id?: string
+          id?: string
+          teacher_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teacher_grades_grade_id_fkey"
+            columns: ["grade_id"]
+            isOneToOne: false
+            referencedRelation: "grades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "teacher"
+      attendance_status: "present" | "absent" | "late" | "excused"
+      behavior_type: "positive" | "negative"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +500,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "teacher"],
+      attendance_status: ["present", "absent", "late", "excused"],
+      behavior_type: ["positive", "negative"],
+    },
   },
 } as const
