@@ -40,9 +40,8 @@ export const Route = createFileRoute("/_authenticated/admin")({
 });
 
 function AdminPage() {
-  const { data: isAdmin, isLoading } = useIsAdmin();
+  const isAdmin = useIsAdmin();
 
-  if (isLoading) return <AppShell title="Admin">{null}</AppShell>;
 
   if (!isAdmin) {
     return (
