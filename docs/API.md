@@ -148,3 +148,30 @@ Body: `{ student_id, session_id, occurred_at, returned_at, note }`
 A teacher who calls an admin-only endpoint directly gets a
 `403 / new row violates row-level security policy` from the database, even if
 the UI button is hidden — the frontend check is cosmetic, RLS is the real one.
+
+---
+
+## Frontend → backend layer: `src/lib/api.ts`
+
+All screens call `api.*` from `src/lib/api.ts`. Nothing else in the UI talks to a backend.
+
+- `ENDPOINTS` in that file lists every route path the app needs (`/me`, `/grades`, `/students`, `/sessions`, `/attendance`, `/behavior-tags`, `/behaviors`, `/bathroom-logs`, `/scoreboard`, `/reports/session`).
+- Set `VITE_API_BASE_URL` to your own server and every call becomes an HTTP request to those routes (JSON, `Authorization: Bearer <token>`). Leave it empty and it uses the built-in Lovable Cloud database.
+
+### Telling admin from teacher
+
+`GET /me` must return:
+
+```json
+{ "id": "...", "email": "...", "fullName": "...", "roles": ["admin"], "isAdmin": true }
+```
+
+In the UI: `useIsAdmin()` / `useMe()` from `src/lib/auth.tsx`.
+
+| | teacher | admin |
+|---|---|---|
+| Schedule, run session, attendance, behavior, bathroom, reports | yes (own sessions) | yes (all) |
+| Behavior tags | view | create / edit / delete |
+| Grades, students upload, teacher↔grade assignment, timetable | no | yes |
+
+Roles are never trusted from the client — your backend must re-check `isAdmin` on every admin route.
