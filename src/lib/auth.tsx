@@ -1,35 +1,32 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { api, type AppRole, type Me } from "@/lib/api";
 
-export type AppRole = "admin" | "teacher";
+export type { AppRole, Me };
+
+/** Current user + roles, fetched through the API layer (src/lib/api.ts). */
+export function useMe() {
+  return useQuery<Me | null>({
+    queryKey: ["me"],
+    queryFn: () => api.auth.me(),
+  });
+}
 
 export function useSession() {
-  return useQuery({
-    queryKey: ["session"],
-    queryFn: async () => {
-      const { data } = await supabase.auth.getUser();
-      return data.user ?? null;
-    },
-  });
+  const q = useMe();
+  return { ...q, data: q.data ? { id: q.data.id, email: q.data.email } : null };
 }
 
 export function useMyRoles() {
-  const { data: user } = useSession();
-  return useQuery({
-    queryKey: ["roles", user?.id],
-    enabled: !!user?.id,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user!.id);
-      if (error) throw error;
-      return (data ?? []).map((r) => r.role as AppRole);
-    },
-  });
+  const q = useMe();
+  return { ...q, data: q.data?.roles ?? [] };
 }
 
+/**
+ * The one check that separates the two user types:
+ *   admin   -> grades, students, teacher assignments, timetable management
+ *   teacher -> own sessions: attendance, behavior, bathroom, reports
+ */
 export function useIsAdmin() {
-  const { data: roles } = useMyRoles();
-  return (roles ?? []).includes("admin");
+  const { data } = useMe();
+  return data?.isAdmin ?? false;
 }
