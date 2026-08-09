@@ -116,7 +116,7 @@ async function http<T>(
   const res = await fetch(url.toString(), {
     method: opts.method ?? "GET",
     headers: { "Content-Type": "application/json", ...(await authHeader()) },
-    body: opts.body === undefined ? undefined : JSON.stringify(opts.body),
+    ...(opts.body === undefined ? {} : { body: JSON.stringify(opts.body) }),
   });
   if (!res.ok) throw new ApiError(await res.text().catch(() => res.statusText), res.status);
   return res.status === 204 ? (undefined as T) : ((await res.json()) as T);
