@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Trophy } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/api";
 import { AppShell } from "@/components/AppShell";
 import {
   Select,
@@ -36,11 +36,7 @@ function Scoreboard() {
 
   const { data: grades } = useQuery({
     queryKey: ["grades"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("grades").select("id,name").order("name");
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => api.grades.list(),
   });
 
   const activeGrade = gradeId || grades?.[0]?.id || "";
@@ -48,14 +44,7 @@ function Scoreboard() {
   const { data: students } = useQuery({
     queryKey: ["students", activeGrade],
     enabled: !!activeGrade,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("students")
-        .select("id,full_name,student_code")
-        .eq("grade_id", activeGrade);
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => api.students.listByGrade(activeGrade),
   });
 
   const ids = (students ?? []).map((s) => s.id);
@@ -63,14 +52,7 @@ function Scoreboard() {
   const { data: behaviors } = useQuery({
     queryKey: ["scores", activeGrade, ids.length],
     enabled: ids.length > 0,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("behaviors")
-        .select("student_id,points,type")
-        .in("student_id", ids);
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => api.behaviors.list({ student_ids: ids }),
   });
 
   const rows = useMemo(() => {
