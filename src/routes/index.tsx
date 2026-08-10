@@ -50,6 +50,7 @@ const features = [
 
 function Landing() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     if (user) navigate({ to: "/schedule", replace: true });
