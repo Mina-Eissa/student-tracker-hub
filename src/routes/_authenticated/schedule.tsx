@@ -33,10 +33,13 @@ function SchedulePage() {
   const navigate = useNavigate();
   const todayIdx = new Date().getDay();
 
+  const { data: grades } = useQuery({ queryKey: ["grades"], queryFn: () => api.grades.list() });
+  const gradeName = (id: string) => grades?.find((g) => g.id === id)?.name ?? "";
+
   const { data: sessions, isLoading } = useQuery({
     queryKey: ["schedule", user?.id, isAdmin],
     enabled: !!user?.id,
-    queryFn: () => api.sessions.list(isAdmin ? {} : { teacher_id: user!.id }),
+    queryFn: () => api.sessions.list(isAdmin ? undefined : user!.id),
   });
 
   return (
@@ -74,7 +77,7 @@ function SchedulePage() {
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium">{s.title}</p>
                       <p className="text-xs text-muted-foreground">
-                        {s.grade_name} · {fmtTime(s.start_time)}–{fmtTime(s.end_time)}
+                        {gradeName(s.grade_id)} · {fmtTime(s.start_time)}–{fmtTime(s.end_time)}
                         {s.room ? ` · ${s.room}` : ""}
                       </p>
                     </div>
