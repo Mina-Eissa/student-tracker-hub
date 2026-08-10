@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { api, type BehaviorTag } from "@/api";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,12 +43,7 @@ export const Route = createFileRoute("/_authenticated/tags")({
   component: TagsPage,
 });
 
-type Tag = {
-  id: string;
-  name: string;
-  type: "positive" | "negative";
-  points: number;
-};
+type Tag = BehaviorTag;
 
 function TagsPage() {
   const qc = useQueryClient();
@@ -56,15 +51,7 @@ function TagsPage() {
 
   const { data: tags } = useQuery({
     queryKey: ["behavior_tags"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("behavior_tags")
-        .select("id,name,type,points")
-        .order("type")
-        .order("name");
-      if (error) throw error;
-      return data as Tag[];
-    },
+    queryFn: () => api.behaviorTags.list(),
   });
 
   const save = useMutation({
@@ -74,16 +61,8 @@ function TagsPage() {
       const type = (t.type ?? "positive") as "positive" | "negative";
       const magnitude = Math.abs(Number(t.points ?? 1));
       const points = type === "positive" ? magnitude : -magnitude;
-      if (t.id) {
-        const { error } = await supabase
-          .from("behavior_tags")
-          .update({ name, type, points })
-          .eq("id", t.id);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from("behavior_tags").insert({ name, type, points });
-        if (error) throw error;
-      }
+      if (t.id) await api.behaviorTags.update(t.id, { name, type, points });
+      else await api.behaviorTags.create({ name, type, points });
     },
     onSuccess: () => {
       toast.success("Tag saved");
@@ -94,10 +73,7 @@ function TagsPage() {
   });
 
   const remove = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("behavior_tags").delete().eq("id", id);
-      if (error) throw error;
-    },
+    mutationFn: (id: string) => api.behaviorTags.remove(id),
     onSuccess: () => {
       toast.success("Tag deleted");
       qc.invalidateQueries({ queryKey: ["behavior_tags"] });
