@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { CalendarDays, ClipboardList, DoorOpen, FileText, Trophy } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
@@ -50,12 +50,11 @@ const features = [
 
 function Landing() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/schedule", replace: true });
-    });
-  }, [navigate]);
+    if (user) navigate({ to: "/schedule", replace: true });
+  }, [user, navigate]);
 
   return (
     <div className="min-h-screen bg-background">

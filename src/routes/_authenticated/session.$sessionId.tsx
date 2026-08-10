@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, DoorOpen, Minus, Plus } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/api";
 import { fmtClock, fmtTime, todayISO } from "@/lib/format";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -61,85 +61,37 @@ function SessionPage() {
 
   const { data: session } = useQuery({
     queryKey: ["session-detail", sessionId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("sessions")
-        .select("id,title,grade_id,start_time,end_time,room,grades(name)")
-        .eq("id", sessionId)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => api.sessions.get(sessionId),
   });
 
   const gradeId = session?.grade_id;
+  const { data: grades } = useQuery({ queryKey: ["grades"], queryFn: () => api.grades.list() });
+  const gradeName = grades?.find((g) => g.id === gradeId)?.name ?? "";
 
   const { data: students } = useQuery({
     queryKey: ["students", gradeId],
     enabled: !!gradeId,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("students")
-        .select("id,full_name,student_code")
-        .eq("grade_id", gradeId!)
-        .order("full_name");
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => api.students.listByGrade(gradeId!),
   });
 
   const { data: attendance } = useQuery({
     queryKey: ["attendance", sessionId, date],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("attendance")
-        .select("student_id,status,reason")
-        .eq("session_id", sessionId)
-        .eq("session_date", date);
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => api.attendance.listForSession(sessionId, date),
   });
 
   const { data: tags } = useQuery({
     queryKey: ["behavior_tags"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("behavior_tags")
-        .select("*")
-        .order("type")
-        .order("name");
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => api.behaviorTags.list(),
   });
 
   const { data: behaviors } = useQuery({
     queryKey: ["behaviors", sessionId, date],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("behaviors")
-        .select("id,student_id,points,type,comment,consequence,created_at,behavior_tags(name)")
-        .eq("session_id", sessionId)
-        .eq("session_date", date)
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => api.behaviors.list({ session_id: sessionId, date }),
   });
 
   const { data: bathroom } = useQuery({
     queryKey: ["bathroom", sessionId, date],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("bathroom_logs")
-        .select("id,student_id,occurred_at,note")
-        .eq("session_id", sessionId)
-        .gte("occurred_at", `${date}T00:00:00`)
-        .order("occurred_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => api.bathroom.list({ session_id: sessionId }),
   });
 
   const attMap = useMemo(() => {
@@ -163,36 +115,21 @@ function SessionPage() {
   }, [bathroom]);
 
   const setStatus = useMutation({
-    mutationFn: async (v: { studentId: string; status: Status; reason?: string | null }) => {
-      const { data: u } = await supabase.auth.getUser();
-      const { error } = await supabase.from("attendance").upsert(
-        {
-          session_id: sessionId,
-          student_id: v.studentId,
-          session_date: date,
-          status: v.status,
-          reason: v.reason ?? null,
-          recorded_by: u.user!.id,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "session_id,student_id,session_date" },
-      );
-      if (error) throw error;
-    },
+    mutationFn: (v: { studentId: string; status: Status; reason?: string | null }) =>
+      api.attendance.set({
+        session_id: sessionId,
+        student_id: v.studentId,
+        session_date: date,
+        status: v.status,
+        reason: v.reason ?? null,
+      }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["attendance", sessionId, date] }),
     onError: (e: Error) => toast.error(e.message),
   });
 
   const logBathroom = useMutation({
-    mutationFn: async (studentId: string) => {
-      const { data: u } = await supabase.auth.getUser();
-      const { error } = await supabase.from("bathroom_logs").insert({
-        student_id: studentId,
-        session_id: sessionId,
-        recorded_by: u.user!.id,
-      });
-      if (error) throw error;
-    },
+    mutationFn: (studentId: string) =>
+      api.bathroom.log({ student_id: studentId, session_id: sessionId }),
     onSuccess: () => {
       toast.success("Bathroom trip logged");
       qc.invalidateQueries({ queryKey: ["bathroom", sessionId, date] });
@@ -214,7 +151,7 @@ function SessionPage() {
       title={session?.title ?? "Session"}
       description={
         session
-          ? `${session.grades?.name ?? ""} · ${fmtTime(session.start_time)}–${fmtTime(
+          ? `${gradeName} · ${fmtTime(session.start_time)}–${fmtTime(
               session.end_time,
             )} · ${new Date().toLocaleDateString()}`
           : undefined
@@ -315,7 +252,7 @@ function SessionPage() {
                   <li key={b.id} className="text-xs">
                     <div className="flex items-center gap-2">
                       <Badge variant={b.type === "positive" ? "default" : "destructive"}>
-                        {b.behavior_tags?.name ?? b.type}
+                        {(tags ?? []).find((t) => t.id === b.tag_id)?.name ?? b.type}
                       </Badge>
                       <span className="tabular-nums text-muted-foreground">
                         {b.points > 0 ? `+${b.points}` : b.points}
@@ -469,8 +406,7 @@ function BehaviorDialog({
   const save = useMutation({
     mutationFn: async () => {
       if (!student || !tag) throw new Error("Pick a behavior tag first");
-      const { data: u } = await supabase.auth.getUser();
-      const { error } = await supabase.from("behaviors").insert({
+      await api.behaviors.create({
         student_id: student.id,
         session_id: sessionId,
         session_date: date,
@@ -479,9 +415,7 @@ function BehaviorDialog({
         points: tag.points,
         comment: comment.trim() || null,
         consequence: consequence.trim() || null,
-        recorded_by: u.user!.id,
       });
-      if (error) throw error;
     },
     onSuccess: () => {
       toast.success("Behavior recorded");

@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Play, CalendarDays } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/api";
 import { useSession, useIsAdmin } from "@/lib/auth";
 import { DAYS, fmtTime } from "@/lib/format";
 import { AppShell } from "@/components/AppShell";
@@ -27,38 +27,19 @@ export const Route = createFileRoute("/_authenticated/schedule")({
   component: SchedulePage,
 });
 
-type Row = {
-  id: string;
-  title: string;
-  day_of_week: number;
-  start_time: string;
-  end_time: string;
-  room: string | null;
-  grade_id: string;
-  teacher_id: string;
-  grades: { name: string } | null;
-};
-
 function SchedulePage() {
   const { data: user } = useSession();
   const isAdmin = useIsAdmin();
   const navigate = useNavigate();
   const todayIdx = new Date().getDay();
 
+  const { data: grades } = useQuery({ queryKey: ["grades"], queryFn: () => api.grades.list() });
+  const gradeName = (id: string) => grades?.find((g) => g.id === id)?.name ?? "";
+
   const { data: sessions, isLoading } = useQuery({
     queryKey: ["schedule", user?.id, isAdmin],
     enabled: !!user?.id,
-    queryFn: async () => {
-      let q = supabase
-        .from("sessions")
-        .select("id,title,day_of_week,start_time,end_time,room,grade_id,teacher_id,grades(name)")
-        .order("day_of_week")
-        .order("start_time");
-      if (!isAdmin) q = q.eq("teacher_id", user!.id);
-      const { data, error } = await q;
-      if (error) throw error;
-      return data as unknown as Row[];
-    },
+    queryFn: () => api.sessions.list(isAdmin ? undefined : user!.id),
   });
 
   return (
@@ -96,7 +77,7 @@ function SchedulePage() {
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium">{s.title}</p>
                       <p className="text-xs text-muted-foreground">
-                        {s.grades?.name} · {fmtTime(s.start_time)}–{fmtTime(s.end_time)}
+                        {gradeName(s.grade_id)} · {fmtTime(s.start_time)}–{fmtTime(s.end_time)}
                         {s.room ? ` · ${s.room}` : ""}
                       </p>
                     </div>

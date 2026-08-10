@@ -8,9 +8,7 @@ import {
   Trophy,
   FileText,
 } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useIsAdmin, useSession } from "@/lib/auth";
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import type { ReactNode } from "react";
 
@@ -32,15 +30,11 @@ export function AppShell({
   children: ReactNode;
   actions?: ReactNode | undefined;
 }) {
-  const isAdmin = useIsAdmin();
-  const { data: user } = useSession();
+  const { user, isAdmin, signOut: doSignOut } = useAuth();
   const navigate = useNavigate();
-  const qc = useQueryClient();
 
   async function signOut() {
-    await qc.cancelQueries();
-    qc.clear();
-    await supabase.auth.signOut();
+    await doSignOut();
     navigate({ to: "/auth", replace: true });
   }
 
