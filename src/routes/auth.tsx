@@ -1,9 +1,9 @@
-import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ClipboardList } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
+import { SOCIAL_AUTH, USE_MOCK } from "@/api";
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,73 +27,66 @@ export const Route = createFileRoute("/auth")({
       },
     ],
   }),
-  validateSearch: (s: Record<string, unknown>) => ({
-    redirect: typeof s['redirect'] === "string" ? (s['redirect'] as string) : undefined,
-  }),
   component: AuthPage,
 });
 
 function AuthPage() {
   const navigate = useNavigate();
-  const search = useSearch({ from: "/auth" });
-  const dest = search.redirect && search.redirect.startsWith("/") ? search.redirect : "/schedule";
+  const { user, signIn, signUp, signInWithSocial } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
+  const [first, setFirst] = useState("");
+  const [middle, setMiddle] = useState("");
+  const [last, setLast] = useState("");
   const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: dest, replace: true });
-    });
-  }, [dest, navigate]);
+    if (user) navigate({ to: "/schedule", replace: true });
+  }, [user, navigate]);
 
-  async function signIn(e: React.FormEvent) {
+  async function onSignIn(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (error) {
-      toast.error(error.message);
-      return;
+    try {
+      await signIn(email, password);
+      navigate({ to: "/schedule", replace: true });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Sign in failed");
+    } finally {
+      setLoading(false);
     }
-    navigate({ to: dest, replace: true });
   }
 
-  async function signUp(e: React.FormEvent) {
+  async function onSignUp(e: React.FormEvent) {
     e.preventDefault();
+    if (!first.trim()) {
+      toast.error("First name is required");
+      return;
+    }
     setLoading(true);
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: window.location.origin,
-        data: { full_name: fullName },
-      },
-    });
-    setLoading(false);
-    if (error) {
-      toast.error(error.message);
-      return;
+    try {
+      await signUp({
+        first_name: first.trim(),
+        middle_name: middle.trim() || null,
+        last_name: last.trim() || null,
+        email,
+        password,
+      });
+      navigate({ to: "/schedule", replace: true });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Sign up failed");
+    } finally {
+      setLoading(false);
     }
-    if (!data.session) {
-      setSent(true);
-      return;
-    }
-    navigate({ to: dest, replace: true });
   }
 
-  async function google() {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      toast.error("Google sign-in failed");
-      return;
+  async function onSocial(provider: (typeof SOCIAL_AUTH.enabledProviders)[number]) {
+    try {
+      await signInWithSocial(provider);
+      navigate({ to: "/schedule", replace: true });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Social sign-in failed");
     }
-    if (result.redirected) return;
-    navigate({ to: dest, replace: true });
   }
 
   return (
@@ -111,88 +104,111 @@ function AuthPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {sent ? (
-              <p className="text-sm text-muted-foreground">
-                Check your inbox to confirm your email address, then come back and sign in.
-              </p>
-            ) : (
-              <Tabs defaultValue="signin">
-                <TabsList className="mb-4 grid w-full grid-cols-2">
-                  <TabsTrigger value="signin">Sign in</TabsTrigger>
-                  <TabsTrigger value="signup">Create account</TabsTrigger>
-                </TabsList>
-                <TabsContent value="signin">
-                  <form onSubmit={signIn} className="space-y-3">
+            <Tabs defaultValue="signin">
+              <TabsList className="mb-4 grid w-full grid-cols-2">
+                <TabsTrigger value="signin">Sign in</TabsTrigger>
+                <TabsTrigger value="signup">Create account</TabsTrigger>
+              </TabsList>
+              <TabsContent value="signin">
+                <form onSubmit={onSignIn} className="space-y-3">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    Sign in
+                  </Button>
+                </form>
+              </TabsContent>
+              <TabsContent value="signup">
+                <form onSubmit={onSignUp} className="space-y-3">
+                  <div className="grid gap-3 sm:grid-cols-3">
                     <div className="space-y-1.5">
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                      />
+                      <Label htmlFor="first">First name</Label>
+                      <Input id="first" required value={first} onChange={(e) => setFirst(e.target.value)} />
                     </div>
                     <div className="space-y-1.5">
-                      <Label htmlFor="password">Password</Label>
-                      <Input
-                        id="password"
-                        type="password"
-                        required
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                      />
+                      <Label htmlFor="middle">Middle</Label>
+                      <Input id="middle" value={middle} onChange={(e) => setMiddle(e.target.value)} />
                     </div>
-                    <Button type="submit" className="w-full" disabled={loading}>
-                      Sign in
+                    <div className="space-y-1.5">
+                      <Label htmlFor="last">Last</Label>
+                      <Input id="last" value={last} onChange={(e) => setLast(e.target.value)} />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="email2">Email</Label>
+                    <Input
+                      id="email2"
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="password2">Password</Label>
+                    <Input
+                      id="password2"
+                      type="password"
+                      required
+                      minLength={6}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    Create teacher account
+                  </Button>
+                </form>
+              </TabsContent>
+            </Tabs>
+
+            {SOCIAL_AUTH.enabledProviders.length > 0 && (
+              <>
+                <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
+                  <span className="h-px flex-1 bg-border" /> or{" "}
+                  <span className="h-px flex-1 bg-border" />
+                </div>
+                <div className="space-y-2">
+                  {SOCIAL_AUTH.enabledProviders.map((p) => (
+                    <Button
+                      key={p}
+                      variant="outline"
+                      className="w-full capitalize"
+                      onClick={() => onSocial(p)}
+                    >
+                      Continue with {p}
                     </Button>
-                  </form>
-                </TabsContent>
-                <TabsContent value="signup">
-                  <form onSubmit={signUp} className="space-y-3">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="name">Full name</Label>
-                      <Input
-                        id="name"
-                        required
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="email2">Email</Label>
-                      <Input
-                        id="email2"
-                        type="email"
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="password2">Password</Label>
-                      <Input
-                        id="password2"
-                        type="password"
-                        required
-                        minLength={6}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                      />
-                    </div>
-                    <Button type="submit" className="w-full" disabled={loading}>
-                      Create teacher account
-                    </Button>
-                  </form>
-                </TabsContent>
-              </Tabs>
+                  ))}
+                </div>
+              </>
             )}
-            <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
-              <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
-            </div>
-            <Button variant="outline" className="w-full" onClick={google}>
-              Continue with Google
-            </Button>
+
+            {USE_MOCK && (
+              <p className="mt-4 rounded-md bg-muted p-3 text-xs text-muted-foreground">
+                Demo mode — no backend configured. Sign in with{" "}
+                <strong>admin@school.test / admin123</strong> or{" "}
+                <strong>teacher@school.test / teacher123</strong>. Point the app at your API in{" "}
+                <code>src/api/config.ts</code>.
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>
