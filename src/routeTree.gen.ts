@@ -18,6 +18,7 @@ import { Route as AuthenticatedScheduleRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedScoreboardRouteImport } from './routes/_authenticated/scoreboard'
 import { Route as AuthenticatedTagsRouteImport } from './routes/_authenticated/tags'
 import { Route as AuthenticatedSessionSessionIdRouteImport } from './routes/_authenticated/session.$sessionId'
+import { Route as AuthenticatedUsersNewRouteImport } from './routes/_authenticated/users.new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -64,6 +65,11 @@ const AuthenticatedSessionSessionIdRoute =
     path: '/session/$sessionId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedUsersNewRoute = AuthenticatedUsersNewRouteImport.update({
+  id: '/users/new',
+  path: '/users/new',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/scoreboard': typeof AuthenticatedScoreboardRoute
   '/tags': typeof AuthenticatedTagsRoute
   '/session/$sessionId': typeof AuthenticatedSessionSessionIdRoute
+  '/users/new': typeof AuthenticatedUsersNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -84,6 +91,7 @@ export interface FileRoutesByTo {
   '/scoreboard': typeof AuthenticatedScoreboardRoute
   '/tags': typeof AuthenticatedTagsRoute
   '/session/$sessionId': typeof AuthenticatedSessionSessionIdRoute
+  '/users/new': typeof AuthenticatedUsersNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -96,6 +104,7 @@ export interface FileRoutesById {
   '/_authenticated/scoreboard': typeof AuthenticatedScoreboardRoute
   '/_authenticated/tags': typeof AuthenticatedTagsRoute
   '/_authenticated/session/$sessionId': typeof AuthenticatedSessionSessionIdRoute
+  '/_authenticated/users/new': typeof AuthenticatedUsersNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -108,6 +117,7 @@ export interface FileRouteTypes {
     | '/scoreboard'
     | '/tags'
     | '/session/$sessionId'
+    | '/users/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/scoreboard'
     | '/tags'
     | '/session/$sessionId'
+    | '/users/new'
   id:
     | '__root__'
     | '/'
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/_authenticated/scoreboard'
     | '/_authenticated/tags'
     | '/_authenticated/session/$sessionId'
+    | '/_authenticated/users/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -202,6 +214,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSessionSessionIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/users/new': {
+      id: '/_authenticated/users/new'
+      path: '/users/new'
+      fullPath: '/users/new'
+      preLoaderRoute: typeof AuthenticatedUsersNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -212,6 +231,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedScoreboardRoute: typeof AuthenticatedScoreboardRoute
   AuthenticatedTagsRoute: typeof AuthenticatedTagsRoute
   AuthenticatedSessionSessionIdRoute: typeof AuthenticatedSessionSessionIdRoute
+  AuthenticatedUsersNewRoute: typeof AuthenticatedUsersNewRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -221,6 +241,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedScoreboardRoute: AuthenticatedScoreboardRoute,
   AuthenticatedTagsRoute: AuthenticatedTagsRoute,
   AuthenticatedSessionSessionIdRoute: AuthenticatedSessionSessionIdRoute,
+  AuthenticatedUsersNewRoute: AuthenticatedUsersNewRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
