@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Printer } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/api";
 import { AppShell } from "@/components/AppShell";
 import { fmtClock, fmtTime, todayISO } from "@/lib/format";
 import { Button } from "@/components/ui/button";
@@ -41,50 +41,29 @@ function Reports() {
 
   const { data: sessions } = useQuery({
     queryKey: ["all-sessions"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("sessions")
-        .select("id,title,start_time,end_time,grade_id,room,grades(name)")
-        .order("start_time");
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => api.sessions.list(),
   });
 
   const session = (sessions ?? []).find((s) => s.id === sessionId);
+  const { data: grades } = useQuery({ queryKey: ["grades"], queryFn: () => api.grades.list() });
+  const { data: tags } = useQuery({ queryKey: ["behavior_tags"], queryFn: () => api.behaviorTags.list() });
+  const gradeName = (id: string) => grades?.find((g) => g.id === id)?.name ?? "";
 
   const { data: report } = useQuery({
     queryKey: ["report", sessionId, date],
     enabled: !!sessionId && !!date,
     queryFn: async () => {
       const [students, attendance, behaviors, bathroom] = await Promise.all([
-        supabase
-          .from("students")
-          .select("id,full_name,student_code")
-          .eq("grade_id", session!.grade_id)
-          .order("full_name"),
-        supabase
-          .from("attendance")
-          .select("student_id,status,reason")
-          .eq("session_id", sessionId)
-          .eq("session_date", date),
-        supabase
-          .from("behaviors")
-          .select("student_id,points,type,comment,consequence,behavior_tags(name)")
-          .eq("session_id", sessionId)
-          .eq("session_date", date),
-        supabase
-          .from("bathroom_logs")
-          .select("student_id,occurred_at")
-          .eq("session_id", sessionId)
-          .gte("occurred_at", `${date}T00:00:00`)
-          .lte("occurred_at", `${date}T23:59:59`),
+        api.students.listByGrade(session!.grade_id),
+        api.attendance.listForSession(sessionId, date),
+        api.behaviors.list({ session_id: sessionId, date }),
+        api.bathroom.list({ session_id: sessionId }),
       ]);
       return {
-        students: students.data ?? [],
-        attendance: attendance.data ?? [],
-        behaviors: behaviors.data ?? [],
-        bathroom: bathroom.data ?? [],
+        students,
+        attendance,
+        behaviors,
+        bathroom: bathroom.filter((b) => b.occurred_at.slice(0, 10) === date),
       };
     },
   });
@@ -113,7 +92,7 @@ function Reports() {
             <SelectContent>
               {(sessions ?? []).map((s) => (
                 <SelectItem key={s.id} value={s.id}>
-                  {s.title} — {s.grades?.name} ({fmtTime(s.start_time)})
+                  {s.title} — {gradeName(s.grade_id)} ({fmtTime(s.start_time)})
                 </SelectItem>
               ))}
             </SelectContent>
@@ -132,7 +111,7 @@ function Reports() {
           <header className="border-b border-border pb-4">
             <h2 className="text-lg font-semibold">{session.title}</h2>
             <p className="text-sm text-muted-foreground">
-              {session.grades?.name} · {new Date(date).toDateString()} ·{" "}
+              {gradeName(session.grade_id)} · {new Date(date).toDateString()} ·{" "}
               {fmtTime(session.start_time)}–{fmtTime(session.end_time)}
               {session.room ? ` · ${session.room}` : ""}
             </p>
@@ -188,7 +167,7 @@ function Reports() {
                   <span className="font-medium text-foreground">
                     {report.students.find((s) => s.id === b.student_id)?.full_name}
                   </span>{" "}
-                  — {b.behavior_tags?.name ?? b.type} ({b.points > 0 ? `+${b.points}` : b.points})
+                  — {(tags ?? []).find((t) => t.id === b.tag_id)?.name ?? b.type} ({b.points > 0 ? `+${b.points}` : b.points})
                   {b.comment ? ` · ${b.comment}` : ""}
                   {b.consequence ? ` · Consequence: ${b.consequence}` : ""}
                 </li>
