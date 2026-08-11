@@ -37,7 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({
       user: data ?? null,
       isLoading,
-      isAdmin: data?.isAdmin ?? false,
+      isAdmin: data?.role === "Admin",
       signIn: async (email, password) => {
         const user = await api.auth.signIn(email, password);
         qc.setQueryData(["me"], user);

@@ -11,7 +11,7 @@ export interface SignUpInput extends PersonName {
 function toAuthUser(u: {
   id: string;
   email: string;
-  role: "admin" | "teacher";
+  role: "Admin" | "Teacher";
   first_name: string;
   middle_name: string | null;
   last_name: string | null;
@@ -24,13 +24,12 @@ function toAuthUser(u: {
     last_name: u.last_name,
     full_name: fullName(u),
     roles: [u.role],
-    isAdmin: u.role === "admin",
+    isAdmin: u.role === "Admin",
   };
 }
 
 export const authApi = {
   isAuthenticated: () => !!getToken(),
-
   async signIn(email: string, password: string): Promise<AuthUser> {
     if (!USE_MOCK) {
       const res = await http<{ token: string; user: AuthUser }>(ENDPOINTS.signIn, {
@@ -38,6 +37,7 @@ export const authApi = {
         body: { email, password },
       });
       setToken(res.token);
+      console.log("signIn successful, user:", res.user);
       return res.user;
     }
     const user = db().users.find((u) => u.email.toLowerCase() === email.trim().toLowerCase());
@@ -68,7 +68,7 @@ export const authApi = {
       middle_name: input.middle_name,
       last_name: input.last_name,
       full_name: fullName(input),
-      role: "teacher" as const,
+      role: "Teacher" as const,
       created_at: new Date().toISOString(),
       password: input.password,
     };

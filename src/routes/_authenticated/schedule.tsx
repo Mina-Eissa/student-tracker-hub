@@ -63,10 +63,7 @@ function SchedulePage() {
           const rows = (sessions ?? []).filter((s) => s.day_of_week === idx);
           if (rows.length === 0) return null;
           return (
-            <section
-              key={day}
-              className="rounded-lg border border-border bg-card overflow-hidden"
-            >
+            <section key={day} className="rounded-lg border border-border bg-card overflow-hidden">
               <header className="flex items-center justify-between border-b border-border px-4 py-3">
                 <h2 className="text-sm font-semibold">{day}</h2>
                 {idx === todayIdx && <Badge>Today</Badge>}

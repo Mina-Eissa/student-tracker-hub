@@ -40,7 +40,7 @@ function seed(): MockDb {
     middle_name: "Hassan",
     last_name: "Saleh",
     full_name: "Amina Hassan Saleh",
-    role: "admin",
+    role: "Admin",
     created_at: now(),
     password: "admin123",
   };
@@ -51,7 +51,7 @@ function seed(): MockDb {
     middle_name: null,
     last_name: "Khaled",
     full_name: "Omar Khaled",
-    role: "teacher",
+    role: "Teacher",
     created_at: now(),
     password: "teacher123",
   };

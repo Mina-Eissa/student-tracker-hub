@@ -19,7 +19,7 @@
 
 /** Base URL of your REST API. Empty string = demo/mock mode. */
 export const API_BASE_URL: string =
-  (import.meta.env['VITE_API_BASE_URL'] as string | undefined) ?? "";
+  (import.meta.env["VITE_API_BASE_URL"] as string | undefined) ?? "";
 
 /** When true, all api calls are served by the local demo store. */
 export const USE_MOCK = API_BASE_URL.trim().length === 0;
@@ -46,14 +46,14 @@ export const SOCIAL_AUTH = {
 
   /** Optional: your own Supabase project. Leave blank if unused. */
   supabase: {
-    url: import.meta.env['VITE_SUPABASE_URL'] ?? "",
-    anonKey: import.meta.env['VITE_SUPABASE_ANON_KEY'] ?? "",
+    url: import.meta.env["VITE_SUPABASE_URL"] ?? "",
+    anonKey: import.meta.env["VITE_SUPABASE_ANON_KEY"] ?? "",
   },
 
   /** Optional: OAuth client ids if you talk to providers directly. */
   clients: {
-    google: import.meta.env['VITE_GOOGLE_CLIENT_ID'] ?? "",
-    apple: import.meta.env['VITE_APPLE_CLIENT_ID'] ?? "",
+    google: import.meta.env["VITE_GOOGLE_CLIENT_ID"] ?? "",
+    apple: import.meta.env["VITE_APPLE_CLIENT_ID"] ?? "",
   },
 } as const;
 
@@ -67,10 +67,10 @@ export type SocialProvider = "google" | "apple" | "microsoft" | "facebook";
  */
 export const ENDPOINTS = {
   // auth
-  signIn: "/auth/login",
+  signIn: "/auth/signin/",
   signUp: "/auth/register",
   signOut: "/auth/logout",
-  me: "/auth/me",
+  me: "/auth/me/",
   social: (provider: string) => `/auth/social/${provider}`,
 
   // users (admin)

@@ -251,10 +251,7 @@ function StudentsTab() {
 
   const upload = useMutation({
     mutationFn: () => {
-      const rows = bulk
-        .split("\n")
-        .map(parseRosterLine)
-        .filter(Boolean) as StudentInput[];
+      const rows = bulk.split("\n").map(parseRosterLine).filter(Boolean) as StudentInput[];
       return api.students.bulkCreate(active, rows);
     },
     onSuccess: (n) => {

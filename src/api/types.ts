@@ -1,6 +1,6 @@
 /** Shared types for every API module. */
 
-export type AppRole = "admin" | "teacher";
+export type AppRole = "Admin" | "Teacher";
 export type AttendanceStatus = "present" | "absent" | "late" | "excused";
 export type BehaviorType = "positive" | "negative";
 
@@ -20,7 +20,7 @@ export interface AuthUser extends PersonName {
   id: string;
   email: string;
   full_name: string;
-  roles: AppRole[];
+  role: AppRole;
   isAdmin: boolean;
 }
 

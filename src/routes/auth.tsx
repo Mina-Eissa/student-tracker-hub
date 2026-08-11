@@ -44,7 +44,7 @@ function AuthPage() {
     if (user) navigate({ to: "/schedule", replace: true });
   }, [user, navigate]);
 
-  async function onSignIn(e: React.FormEvent) {
+  async function onSignIn(e: React.SubmitEvent) {
     e.preventDefault();
     setLoading(true);
     try {
@@ -57,7 +57,7 @@ function AuthPage() {
     }
   }
 
-  async function onSignUp(e: React.FormEvent) {
+  async function onSignUp(e: React.SubmitEvent) {
     e.preventDefault();
     if (!first.trim()) {
       toast.error("First name is required");
@@ -141,11 +141,20 @@ function AuthPage() {
                   <div className="grid gap-3 sm:grid-cols-3">
                     <div className="space-y-1.5">
                       <Label htmlFor="first">First name</Label>
-                      <Input id="first" required value={first} onChange={(e) => setFirst(e.target.value)} />
+                      <Input
+                        id="first"
+                        required
+                        value={first}
+                        onChange={(e) => setFirst(e.target.value)}
+                      />
                     </div>
                     <div className="space-y-1.5">
                       <Label htmlFor="middle">Middle</Label>
-                      <Input id="middle" value={middle} onChange={(e) => setMiddle(e.target.value)} />
+                      <Input
+                        id="middle"
+                        value={middle}
+                        onChange={(e) => setMiddle(e.target.value)}
+                      />
                     </div>
                     <div className="space-y-1.5">
                       <Label htmlFor="last">Last</Label>
@@ -180,7 +189,7 @@ function AuthPage() {
               </TabsContent>
             </Tabs>
 
-            {SOCIAL_AUTH.enabledProviders.length > 0 && (
+            {/* {SOCIAL_AUTH.enabledProviders.length > 0 && (
               <>
                 <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
                   <span className="h-px flex-1 bg-border" /> or{" "}
@@ -199,7 +208,7 @@ function AuthPage() {
                   ))}
                 </div>
               </>
-            )}
+            )} */}
 
             {USE_MOCK && (
               <p className="mt-4 rounded-md bg-muted p-3 text-xs text-muted-foreground">

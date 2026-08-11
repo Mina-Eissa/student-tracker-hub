@@ -14,7 +14,7 @@ export function useMe() {
 
 export function useMyRoles() {
   const { user } = useAuth();
-  return { data: user?.roles ?? [] };
+  return { data: user?.role ?? "Teacher" };
 }
 
 /**
