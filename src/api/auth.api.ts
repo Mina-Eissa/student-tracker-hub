@@ -23,7 +23,7 @@ function toAuthUser(u: {
     middle_name: u.middle_name,
     last_name: u.last_name,
     full_name: fullName(u),
-    roles: [u.role],
+    role: u.role,
     isAdmin: u.role === "Admin",
   };
 }

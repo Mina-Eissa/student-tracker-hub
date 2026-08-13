@@ -8,7 +8,7 @@ export const teachersApi = {
     if (!USE_MOCK) return http(ENDPOINTS.teachers);
     return delay(
       db()
-        .users.filter((u) => u.role === "teacher" || u.role === "admin")
+        .users.filter((u) => u.role === "Teacher" || u.role === "Admin")
         .map((u) => ({ id: u.id, full_name: u.full_name, email: u.email })),
     );
   },

@@ -27,3 +27,12 @@ export function todayISO() {
 export function fmtClock(iso: string) {
   return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
+
+/** 545 -> "9m 05s", 42 -> "42s" */
+export function fmtDuration(totalSeconds: number) {
+  const s = Math.max(0, Math.floor(totalSeconds));
+  const m = Math.floor(s / 60);
+  const rest = s % 60;
+  if (m === 0) return `${rest}s`;
+  return `${m}m ${String(rest).padStart(2, "0")}s`;
+}

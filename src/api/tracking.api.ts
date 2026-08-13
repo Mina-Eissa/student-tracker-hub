@@ -129,21 +129,85 @@ export const bathroomApi = {
         .sort((a, b) => b.occurred_at.localeCompare(a.occurred_at)),
     );
   },
+
+  /**
+   * Student leaves the room. POST /bathroom-logs
+   * body: { student_id, session_id, occurred_at, note }
+   * The backend should answer with the created log (it needs an `id`
+   * so the frontend can close it again when the student comes back).
+   */
   log: async (input: {
     student_id: string;
     session_id?: string | null;
     note?: string | null;
-  }): Promise<void> => {
-    if (!USE_MOCK) return http(ENDPOINTS.bathroomLogs, { method: "POST", body: input });
-    db().bathroom.push({
+  }): Promise<BathroomLog> => {
+    const occurred_at = new Date().toISOString();
+    if (!USE_MOCK)
+      return http(ENDPOINTS.bathroomLogs, {
+        method: "POST",
+        body: { ...input, occurred_at },
+      });
+    const row: BathroomLog = {
       id: uid(),
       student_id: input.student_id,
       session_id: input.session_id ?? null,
-      occurred_at: new Date().toISOString(),
+      occurred_at,
       returned_at: null,
+      duration_seconds: null,
+      duration_minutes: null,
       note: input.note ?? null,
-    });
+    };
+    db().bathroom.push(row);
     save();
+    return delay(row);
+  },
+
+  /**
+   * Student comes back. PATCH /bathroom-logs/:id/return
+   * body: { returned_at, duration_seconds, duration_minutes }
+   * e.g. "student was out for 9 min".
+   */
+  end: async (
+    id: string,
+    input?: { returned_at?: string; duration_seconds?: number },
+  ): Promise<BathroomLog | void> => {
+    const returned_at = input?.returned_at ?? new Date().toISOString();
+    if (!USE_MOCK) {
+      const store = null;
+      void store;
+      const seconds = input?.duration_seconds ?? 0;
+      return http(ENDPOINTS.bathroomLogReturn(id), {
+        method: "PATCH",
+        body: {
+          returned_at,
+          duration_seconds: seconds,
+          duration_minutes: Math.max(1, Math.round(seconds / 60)),
+        },
+      });
+    }
+    const row = db().bathroom.find((b) => b.id === id);
+    if (row) {
+      row.returned_at = returned_at;
+      const seconds =
+        input?.duration_seconds ??
+        Math.max(0, Math.round((Date.parse(returned_at) - Date.parse(row.occurred_at)) / 1000));
+      row.duration_seconds = seconds;
+      row.duration_minutes = Math.max(1, Math.round(seconds / 60));
+    }
+    save();
+    return delay(row);
+  },
+
+  /** Close every still-open trip (used when the session ends). */
+  endAllOpen: async (sessionId: string): Promise<void> => {
+    const open = (await bathroomApi.list({ session_id: sessionId })).filter((b) => !b.returned_at);
+    await Promise.all(
+      open.map((b) =>
+        bathroomApi.end(b.id, {
+          duration_seconds: Math.max(0, Math.round((Date.now() - Date.parse(b.occurred_at)) / 1000)),
+        }),
+      ),
+    );
   },
 };
 
