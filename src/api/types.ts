@@ -102,6 +102,9 @@ export interface BathroomLog {
   session_id: string | null;
   occurred_at: string;
   returned_at: string | null;
+  /** Time spent outside, filled in when the student returns. */
+  duration_seconds: number | null;
+  duration_minutes: number | null;
   note: string | null;
 }
 

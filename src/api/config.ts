@@ -95,6 +95,9 @@ export const ENDPOINTS = {
   behaviorTag: (id: string) => `/behavior-tags/${id}`,
   behaviors: "/behaviors",
   bathroomLogs: "/bathroom-logs",
+  /** PATCH: student came back — body { returned_at, duration_seconds, duration_minutes } */
+  bathroomLogReturn: (id: string) => `/bathroom-logs/${id}/return`,
+  bathroomLog: (id: string) => `/bathroom-logs/${id}`,
   scoreboard: "/scoreboard",
   report: "/reports/session",
 } as const;
