@@ -175,3 +175,12 @@ In the UI: `useIsAdmin()` / `useMe()` from `src/lib/auth.tsx`.
 | Grades, students upload, teacher↔grade assignment, timetable | no | yes |
 
 Roles are never trusted from the client — your backend must re-check `isAdmin` on every admin route.
+
+## Bathroom timer endpoints
+
+| Action | Call | Endpoint | Body |
+| --- | --- | --- | --- |
+| Student goes out (timer starts) | `api.bathroom.log({ student_id, session_id })` | `POST /bathroom-logs` | `{ student_id, session_id, occurred_at }` → must return the created log **including `id`** |
+| Student comes back (timer stops) | `api.bathroom.end(id, { duration_seconds })` | `PATCH /bathroom-logs/:id/return` | `{ returned_at, duration_seconds, duration_minutes }` (e.g. `duration_minutes: 9`) |
+| Session ended, close open trips | `api.bathroom.endAllOpen(sessionId)` | loops the `PATCH .../return` call | — |
+| List trips | `api.bathroom.list({ session_id })` | `GET /bathroom-logs?session_id=` | returns `duration_seconds` / `duration_minutes` when closed |
