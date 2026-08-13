@@ -8,6 +8,7 @@ import { authApi } from "./auth.api";
 import { usersApi } from "./users.api";
 import { gradesApi, studentsApi } from "./students.api";
 import { sessionsApi, teachersApi } from "./sessions.api";
+import { resetMockDb } from "./mock-db";
 import { attendanceApi, bathroomApi, behaviorTagsApi, behaviorsApi, scoreboardApi } from "./tracking.api";
 
 export const api = {
@@ -22,7 +23,14 @@ export const api = {
   behaviors: behaviorsApi,
   bathroom: bathroomApi,
   scoreboard: scoreboardApi,
+  /** Demo helpers — only meaningful while USE_MOCK is true. */
+  mock: { reset: resetMockDb },
 };
+
+// Handy in the browser console: __classtrack.mock.reset() then reload.
+if (typeof window !== "undefined") {
+  (window as unknown as Record<string, unknown>)["__classtrack"] = api;
+}
 
 export * from "./types";
 export { ApiError } from "./http";
