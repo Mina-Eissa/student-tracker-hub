@@ -184,3 +184,21 @@ Roles are never trusted from the client — your backend must re-check `isAdmin`
 | Student comes back (timer stops) | `api.bathroom.end(id, { duration_seconds })` | `PATCH /bathroom-logs/:id/return` | `{ returned_at, duration_seconds, duration_minutes }` (e.g. `duration_minutes: 9`) |
 | Session ended, close open trips | `api.bathroom.endAllOpen(sessionId)` | loops the `PATCH .../return` call | — |
 | List trips | `api.bathroom.list({ session_id })` | `GET /bathroom-logs?session_id=` | returns `duration_seconds` / `duration_minutes` when closed |
+
+## Demo (mock) data
+
+Active whenever `VITE_API_BASE_URL` is empty (`USE_MOCK === true`). Seeded in `src/api/mock-db.ts`,
+persisted in `localStorage` under `classtrack.mockdb.v2`.
+
+Accounts: `admin@school.test / admin123` (Admin), `teacher@school.test / teacher123` (Teacher).
+
+Seeded content:
+- 2 grades (7A, 8B) with 5 students using first / middle / last names.
+- 4 sessions for the teacher, one of them **live right now** ("Mathematics (live now)") so *Start session* works instantly, plus sessions on the next two weekdays.
+- Attendance already recorded for the live session: present / late (Bus delay) / excused (Medical appointment).
+- 4 behaviour tags (Helpful +5, Active participation +3, Noisy −3, Late homework −5) and 7 behaviour records across today and yesterday, so the scoreboard shows a real ranking.
+- Bathroom logs: three finished trips (9 min, 4 min, 6 min) and **one trip still open** so the live timer is visible on load.
+
+Reset the demo data: in the browser console run `__classtrack.mock.reset()` and reload
+(or `localStorage.removeItem("classtrack.mockdb.v2")`). All demo data disappears automatically
+once you set `VITE_API_BASE_URL`.
