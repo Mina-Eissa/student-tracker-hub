@@ -279,19 +279,104 @@ function SessionPage() {
           <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
             <div className="overflow-hidden rounded-lg border border-border bg-card">
               <ul className="divide-y divide-border">
-                {(students ?? []).map((s) => (
-                  <li key={s.id} className="flex items-center justify-between gap-3 px-4 py-3">
-                    <div>
-                      <p className="text-sm font-medium">{s.full_name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {bathroomCount.get(s.id) ?? 0} trip(s) today
-                      </p>
-                    </div>
-                    <Button size="sm" variant="outline" onClick={() => logBathroom.mutate(s.id)}>
-                      <DoorOpen className="size-3.5" /> Log trip
-                    </Button>
-                  </li>
-                ))}
+                {(students ?? []).map((s) => {
+                  const openTrip = (bathroom ?? []).find(
+                    (b) => b.student_id === s.id && !b.returned_at,
+                  );
+                  const done = (bathroom ?? []).filter(
+                    (b) => b.student_id === s.id && b.returned_at,
+                  );
+                  const totalSeconds = done.reduce(
+                    (sum, b) =>
+                      sum +
+                      (b.duration_seconds ??
+                        Math.max(
+                          0,
+                          Math.round(
+                            (Date.parse(b.returned_at!) - Date.parse(b.occurred_at)) / 1000,
+                          ),
+                        )),
+                    0,
+                  );
+                  return (
+                    <li key={s.id} className="flex items-center justify-between gap-3 px-4 py-3">
+                      <HoverCard openDelay={120}>
+                        <HoverCardTrigger asChild>
+                          <div className="min-w-0 cursor-default">
+                            <p className="text-sm font-medium">{s.full_name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {bathroomCount.get(s.id) ?? 0} trip(s) · {fmtDuration(totalSeconds)}{" "}
+                              out
+                            </p>
+                          </div>
+                        </HoverCardTrigger>
+                        <HoverCardContent align="start" className="w-72">
+                          <p className="text-sm font-medium">{s.full_name}</p>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {bathroomCount.get(s.id) ?? 0} trip(s) today · total{" "}
+                            {fmtDuration(totalSeconds)} outside
+                          </p>
+                          <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+                            {(bathroom ?? [])
+                              .filter((b) => b.student_id === s.id)
+                              .map((b) => (
+                                <li key={b.id} className="flex justify-between gap-2">
+                                  <span className="tabular-nums">{fmtClock(b.occurred_at)}</span>
+                                  <span className="tabular-nums">
+                                    {b.returned_at
+                                      ? fmtDuration(
+                                          b.duration_seconds ??
+                                            Math.round(
+                                              (Date.parse(b.returned_at) -
+                                                Date.parse(b.occurred_at)) /
+                                                1000,
+                                            ),
+                                        )
+                                      : "out now"}
+                                  </span>
+                                </li>
+                              ))}
+                            {(bathroom ?? []).filter((b) => b.student_id === s.id).length === 0 && (
+                              <li>No trips yet.</li>
+                            )}
+                          </ul>
+                        </HoverCardContent>
+                      </HoverCard>
+
+                      <div className="flex items-center gap-3">
+                        {openTrip && (
+                          <span className="inline-flex items-center gap-1 rounded-md bg-warning px-2 py-1 text-xs font-semibold tabular-nums text-warning-foreground">
+                            <Timer className="size-3.5" />
+                            {fmtDuration((nowTick - Date.parse(openTrip.occurred_at)) / 1000)}
+                          </span>
+                        )}
+                        {openTrip ? (
+                          <Button
+                            size="sm"
+                            onClick={() =>
+                              endTrip.mutate({
+                                id: openTrip.id,
+                                startedAt: openTrip.occurred_at,
+                              })
+                            }
+                            disabled={endTrip.isPending}
+                          >
+                            <Square className="size-3.5" /> End
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => logBathroom.mutate(s.id)}
+                            disabled={logBathroom.isPending}
+                          >
+                            <DoorOpen className="size-3.5" /> Out
+                          </Button>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
             <div className="rounded-lg border border-border bg-card p-4">
@@ -300,7 +385,17 @@ function SessionPage() {
                 {(bathroom ?? []).map((b) => (
                   <li key={b.id} className="flex justify-between gap-2">
                     <span>{(students ?? []).find((s) => s.id === b.student_id)?.full_name}</span>
-                    <span className="tabular-nums">{fmtClock(b.occurred_at)}</span>
+                    <span className="tabular-nums">
+                      {fmtClock(b.occurred_at)}
+                      {b.returned_at
+                        ? ` · ${fmtDuration(
+                            b.duration_seconds ??
+                              Math.round(
+                                (Date.parse(b.returned_at) - Date.parse(b.occurred_at)) / 1000,
+                              ),
+                          )}`
+                        : " · out"}
+                    </span>
                   </li>
                 ))}
                 {(bathroom ?? []).length === 0 && <li>No trips recorded.</li>}
