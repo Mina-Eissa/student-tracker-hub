@@ -13,8 +13,12 @@ export interface CreateUserInput extends PersonName {
 /** Admin-only: manage the people who can sign in (admins & teachers). */
 export const usersApi = {
   list: async (): Promise<UserRecord[]> => {
-    if (!USE_MOCK) return http(ENDPOINTS.users);
-    return delay(db().users.map(({ password: _p, ...u }) => u));
+    if (!USE_MOCK) {
+      const rows = await http<UserRecord[]>(ENDPOINTS.users);
+      // The backend may return only the name parts — always derive a display name.
+      return (rows ?? []).map((u) => ({ ...u, full_name: fullName(u) }));
+    }
+    return delay(db().users.map(({ password: _p, ...u }) => ({ ...u, full_name: fullName(u) })));
   },
 
   create: async (input: CreateUserInput): Promise<UserRecord> => {
