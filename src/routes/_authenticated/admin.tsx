@@ -41,6 +41,8 @@ export const Route = createFileRoute("/_authenticated/admin")({
 
 function AdminPage() {
   const isAdmin = useIsAdmin();
+  const [tab, setTab] = useState("users");
+  const [sessionGrade, setSessionGrade] = useState("");
 
   if (!isAdmin) {
     return (
