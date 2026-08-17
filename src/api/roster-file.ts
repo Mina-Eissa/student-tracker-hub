@@ -12,7 +12,8 @@ import type { StudentInput } from "./students.api";
 export async function parseRosterFile(file: File): Promise<StudentInput[]> {
   const buffer = await file.arrayBuffer();
   const book = XLSX.read(buffer, { type: "array" });
-  const sheet = book.Sheets[book.SheetNames[0]];
+  const sheetName = book.SheetNames[0];
+  const sheet = sheetName ? book.Sheets[sheetName] : undefined;
   if (!sheet) throw new ApiError("The file has no readable sheet");
 
   const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "" });
@@ -39,7 +40,7 @@ export async function parseRosterFile(file: File): Promise<StudentInput[]> {
         const parts = whole.split(/\s+/);
         first = parts[0] ?? "";
         last = parts.length > 2 ? parts.slice(2).join(" ") : (parts[1] ?? "");
-        middle = parts.length > 2 ? parts[1] : "";
+        middle = parts.length > 2 ? (parts[1] ?? "") : "";
       }
     }
 
