@@ -157,16 +157,20 @@ function UsersTab() {
 
 /* --------------------------------- Grades --------------------------------- */
 
-function GradesTab() {
+const LEVELS = Array.from({ length: 12 }, (_, i) => String(i + 1));
+const SECTIONS = ["A", "B", "C", "D", "E", "F"];
+
+function GradesTab({ onPickGrade }: { onPickGrade: (id: string) => void }) {
   const qc = useQueryClient();
   const { data: grades } = useGrades();
-  const [name, setName] = useState("");
+  const [level, setLevel] = useState("1");
+  const [section, setSection] = useState("A");
+  const name = `Grade ${level}${section}`;
 
   const create = useMutation({
     mutationFn: () => api.grades.create(name),
     onSuccess: () => {
-      setName("");
-      toast.success("Grade added");
+      toast.success(`${name} added`);
       qc.invalidateQueries({ queryKey: ["grades"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -185,23 +189,66 @@ function GradesTab() {
     <div className="grid gap-4 md:grid-cols-2">
       <Panel title="New grade">
         <form
-          className="flex gap-2"
+          className="space-y-3"
           onSubmit={(e) => {
             e.preventDefault();
             create.mutate();
           }}
         >
-          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Grade 5A" />
+          <div className="grid gap-2 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label>Level</Label>
+              <Select value={level} onValueChange={setLevel}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Level" />
+                </SelectTrigger>
+                <SelectContent>
+                  {LEVELS.map((l) => (
+                    <SelectItem key={l} value={l}>
+                      Level {l}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Section</Label>
+              <Select value={section} onValueChange={setSection}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Section" />
+                </SelectTrigger>
+                <SelectContent>
+                  {SECTIONS.map((s) => (
+                    <SelectItem key={s} value={s}>
+                      Section {s}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Will be created as <span className="font-medium text-foreground">{name}</span>
+          </p>
           <Button type="submit">
-            <Plus className="size-4" /> Add
+            <Plus className="size-4" /> Add grade
           </Button>
         </form>
       </Panel>
       <Panel title="Grades">
+        <p className="mb-2 text-xs text-muted-foreground">
+          Select a grade to set up its sessions.
+        </p>
         <ul className="divide-y divide-border">
           {(grades ?? []).map((g) => (
-            <li key={g.id} className="flex items-center justify-between py-2 text-sm">
-              {g.name}
+            <li key={g.id} className="flex items-center justify-between gap-2 py-1 text-sm">
+              <button
+                type="button"
+                onClick={() => onPickGrade(g.id)}
+                className="flex-1 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-accent hover:text-accent-foreground"
+              >
+                {g.name}
+              </button>
               <Button size="icon" variant="ghost" onClick={() => remove.mutate(g.id)}>
                 <Trash2 className="size-4 text-destructive" />
               </Button>
