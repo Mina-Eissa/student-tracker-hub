@@ -58,13 +58,6 @@ function AdminPage() {
     <AppShell
       title="Admin"
       description="Users, grades, students, teachers and the timetable."
-      actions={
-        <Button size="sm" asChild>
-          <Link to="/users/new">
-            <UserPlus className="size-3.5" /> Create user
-          </Link>
-        </Button>
-      }
     >
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="mb-4">
@@ -106,10 +99,21 @@ function useTeachers() {
   return useQuery({ queryKey: ["teachers"], queryFn: () => api.teachers.list() });
 }
 
-function Panel({ title, children }: { title: string; children: React.ReactNode }) {
+function Panel({
+  title,
+  children,
+  action,
+}: {
+  title: string;
+  children: React.ReactNode;
+  action?: React.ReactNode;
+}) {
   return (
     <div className="rounded-lg border border-border bg-card p-4">
-      <h3 className="mb-3 text-sm font-semibold">{title}</h3>
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h3 className="text-sm font-semibold">{title}</h3>
+        {action}
+      </div>
       {children}
     </div>
   );
@@ -132,7 +136,16 @@ function UsersTab() {
   });
 
   return (
-    <Panel title="Accounts that can sign in">
+    <Panel
+      title="Accounts that can sign in"
+      action={
+        <Button size="sm" asChild>
+          <Link to="/users/new">
+            <UserPlus className="size-3.5" /> Create user
+          </Link>
+        </Button>
+      }
+    >
       <ul className="divide-y divide-border">
         {(users ?? []).map((u) => (
           <li key={u.id} className="flex items-center justify-between gap-3 py-2.5">
