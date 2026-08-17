@@ -64,7 +64,7 @@ function AdminPage() {
         </Button>
       }
     >
-      <Tabs defaultValue="users">
+      <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="mb-4">
           <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="grades">Grades</TabsTrigger>
@@ -76,7 +76,12 @@ function AdminPage() {
           <UsersTab />
         </TabsContent>
         <TabsContent value="grades">
-          <GradesTab />
+          <GradesTab
+            onPickGrade={(id) => {
+              setSessionGrade(id);
+              setTab("sessions");
+            }}
+          />
         </TabsContent>
         <TabsContent value="students">
           <StudentsTab />
@@ -85,7 +90,7 @@ function AdminPage() {
           <TeachersTab />
         </TabsContent>
         <TabsContent value="sessions">
-          <SessionsTab />
+          <SessionsTab gradeId={sessionGrade} />
         </TabsContent>
       </Tabs>
     </AppShell>
