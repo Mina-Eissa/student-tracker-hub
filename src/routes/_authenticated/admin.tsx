@@ -136,7 +136,16 @@ function UsersTab() {
   });
 
   return (
-    <Panel title="Accounts that can sign in">
+    <Panel
+      title="Accounts that can sign in"
+      action={
+        <Button size="sm" asChild>
+          <Link to="/users/new">
+            <UserPlus className="size-3.5" /> Create user
+          </Link>
+        </Button>
+      }
+    >
       <ul className="divide-y divide-border">
         {(users ?? []).map((u) => (
           <li key={u.id} className="flex items-center justify-between gap-3 py-2.5">
