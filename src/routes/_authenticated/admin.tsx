@@ -56,13 +56,6 @@ function AdminPage() {
     <AppShell
       title="Admin"
       description="Users, grades, students, teachers and the timetable."
-      actions={
-        <Button size="sm" asChild>
-          <Link to="/users/new">
-            <UserPlus className="size-3.5" /> Create user
-          </Link>
-        </Button>
-      }
     >
       <Tabs defaultValue="users">
         <TabsList className="mb-4">
