@@ -37,5 +37,6 @@ export { ApiError } from "./http";
 export { API_BASE_URL, ENDPOINTS, SOCIAL_AUTH, USE_MOCK } from "./config";
 export type { SocialProvider } from "./config";
 export { parseRosterLine } from "./students.api";
+export { parseRosterFile } from "./roster-file";
 export type { StudentInput } from "./students.api";
 export type { CreateUserInput } from "./users.api";
