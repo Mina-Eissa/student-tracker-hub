@@ -236,9 +236,7 @@ function GradesTab({ onPickGrade }: { onPickGrade: (id: string) => void }) {
         </form>
       </Panel>
       <Panel title="Grades">
-        <p className="mb-2 text-xs text-muted-foreground">
-          Select a grade to set up its sessions.
-        </p>
+        <p className="mb-2 text-xs text-muted-foreground">Select a grade to set up its sessions.</p>
         <ul className="divide-y divide-border">
           {(grades ?? []).map((g) => (
             <li key={g.id} className="flex items-center justify-between gap-2 py-1 text-sm">

@@ -54,6 +54,8 @@ export async function parseRosterFile(file: File): Promise<StudentInput[]> {
   }
 
   if (out.length === 0)
-    throw new ApiError("No students found — expected columns: First Name, Middle Name, Last Name, Student ID");
+    throw new ApiError(
+      "No students found — expected columns: First Name, Middle Name, Last Name, Student ID",
+    );
   return out;
 }
