@@ -507,13 +507,13 @@ function TeachersTab() {
 
 /* -------------------------------- Sessions -------------------------------- */
 
-function SessionsTab() {
+function SessionsTab({ gradeId }: { gradeId?: string }) {
   const qc = useQueryClient();
   const { data: grades } = useGrades();
   const { data: teachers } = useTeachers();
   const [form, setForm] = useState({
     teacher_id: "",
-    grade_id: "",
+    grade_id: gradeId ?? "",
     title: "",
     day_of_week: "1",
     start_time: "08:00",
