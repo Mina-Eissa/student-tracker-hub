@@ -316,6 +316,18 @@ function StudentsTab() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const uploadFile = useMutation({
+    mutationFn: async (file: File) => {
+      const rows = await parseRosterFile(file);
+      return api.students.bulkCreate(active, rows);
+    },
+    onSuccess: (n) => {
+      toast.success(`${n} student(s) imported`);
+      invalidate();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const remove = useMutation({
     mutationFn: (id: string) => api.students.remove(id),
     onSuccess: () => {
