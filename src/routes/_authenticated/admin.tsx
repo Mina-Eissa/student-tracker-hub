@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
-import { api, parseRosterLine, type StudentInput } from "@/api";
+import { api, parseRosterFile, parseRosterLine, type StudentInput } from "@/api";
 import { AppShell } from "@/components/AppShell";
 import { DAYS, fmtTime } from "@/lib/format";
 import { useIsAdmin } from "@/lib/auth";
