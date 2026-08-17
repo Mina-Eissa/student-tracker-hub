@@ -521,6 +521,10 @@ function SessionsTab({ gradeId }: { gradeId?: string }) {
     room: "",
   });
 
+  useEffect(() => {
+    if (gradeId) setForm((f) => ({ ...f, grade_id: gradeId }));
+  }, [gradeId]);
+
   const { data: sessions } = useQuery({
     queryKey: ["all-sessions"],
     queryFn: () => api.sessions.list(),
