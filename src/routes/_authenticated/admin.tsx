@@ -99,10 +99,21 @@ function useTeachers() {
   return useQuery({ queryKey: ["teachers"], queryFn: () => api.teachers.list() });
 }
 
-function Panel({ title, children }: { title: string; children: React.ReactNode }) {
+function Panel({
+  title,
+  children,
+  action,
+}: {
+  title: string;
+  children: React.ReactNode;
+  action?: React.ReactNode;
+}) {
   return (
     <div className="rounded-lg border border-border bg-card p-4">
-      <h3 className="mb-3 text-sm font-semibold">{title}</h3>
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h3 className="text-sm font-semibold">{title}</h3>
+        {action}
+      </div>
       {children}
     </div>
   );
