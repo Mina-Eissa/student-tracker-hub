@@ -353,20 +353,20 @@ function StudentsTab() {
           >
             <div className="grid gap-2 sm:grid-cols-3">
               <div className="space-y-1.5">
-                <Label htmlFor="sfirst">First name</Label>
+                <Label htmlFor="sfirst">First Name</Label>
                 <Input id="sfirst" value={first} onChange={(e) => setFirst(e.target.value)} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="smid">Middle</Label>
+                <Label htmlFor="smid">Middle Name</Label>
                 <Input id="smid" value={middle} onChange={(e) => setMiddle(e.target.value)} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="slast">Last</Label>
+                <Label htmlFor="slast">Last Name</Label>
                 <Input id="slast" value={last} onChange={(e) => setLast(e.target.value)} />
               </div>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="scode">Student code (optional)</Label>
+              <Label htmlFor="scode">Student ID (optional)</Label>
               <Input id="scode" value={code} onChange={(e) => setCode(e.target.value)} />
             </div>
             <Button type="submit" disabled={!active}>
@@ -376,19 +376,38 @@ function StudentsTab() {
         </Panel>
 
         <Panel title="Upload roster">
-          <p className="mb-2 text-xs text-muted-foreground">
-            One student per line: <code>First, Middle, Last, code</code> — middle, last and code are
-            optional.
-          </p>
-          <Textarea
-            rows={6}
-            value={bulk}
-            onChange={(e) => setBulk(e.target.value)}
-            placeholder={"Sara, Ahmed, Kamal, S-101\nOmar, , Nasser"}
-          />
-          <Button className="mt-3" disabled={!active} onClick={() => upload.mutate()}>
-            Upload
-          </Button>
+          <div className="space-y-2">
+            <Label htmlFor="rosterfile">CSV or Excel file</Label>
+            <Input
+              id="rosterfile"
+              type="file"
+              accept=".csv,.xlsx,.xls"
+              disabled={!active || uploadFile.isPending}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                e.target.value = "";
+                if (file) uploadFile.mutate(file);
+              }}
+            />
+            <p className="text-xs text-muted-foreground">
+              Columns: <code>First Name, Middle Name, Last Name, Student ID</code> — only the first
+              name is required.
+            </p>
+          </div>
+
+          <div className="mt-4 space-y-2 border-t border-border pt-4">
+            <Label htmlFor="rosterpaste">Or paste one student per line</Label>
+            <Textarea
+              id="rosterpaste"
+              rows={5}
+              value={bulk}
+              onChange={(e) => setBulk(e.target.value)}
+              placeholder={"Sara, Ahmed, Kamal, S-101\nOmar, , Nasser"}
+            />
+            <Button disabled={!active} onClick={() => upload.mutate()}>
+              Upload
+            </Button>
+          </div>
         </Panel>
       </div>
 
