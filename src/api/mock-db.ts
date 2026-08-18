@@ -83,10 +83,10 @@ function seed(): MockDb {
   ];
 
   const tags: BehaviorTag[] = [
-    { id: uid(), name: "Helpful", type: "positive", points: 5 },
-    { id: uid(), name: "Active participation", type: "positive", points: 3 },
-    { id: uid(), name: "Noisy", type: "negative", points: -3 },
-    { id: uid(), name: "Late homework", type: "negative", points: -5 },
+    { id: uid(), tag: "Helpful", type: "Positive", point: 5 },
+    { id: uid(), tag: "Active participation", type: "Positive", point: 3 },
+    { id: uid(), tag: "Noisy", type: "Negative", point: -3 },
+    { id: uid(), tag: "Late homework", type: "Negative", point: -5 },
   ];
 
   const today = new Date();
@@ -201,7 +201,7 @@ function seed(): MockDb {
     session_id: sessionId,
     tag_id: tag.id,
     type: tag.type,
-    points: tag.points,
+    points: tag.point,
     comment,
     consequence,
     session_date: date,

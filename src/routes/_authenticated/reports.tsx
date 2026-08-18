@@ -167,7 +167,7 @@ function Reports() {
                   <span className="font-medium text-foreground">
                     {report.students.find((s) => s.id === b.student_id)?.full_name}
                   </span>{" "}
-                  — {(tags ?? []).find((t) => t.id === b.tag_id)?.name ?? b.type} ({b.points > 0 ? `+${b.points}` : b.points})
+                  — {(tags ?? []).find((t) => t.id === b.tag_id)?.tag ?? b.type} ({b.points > 0 ? `+${b.points}` : b.points})
                   {b.comment ? ` · ${b.comment}` : ""}
                   {b.consequence ? ` · Consequence: ${b.consequence}` : ""}
                 </li>

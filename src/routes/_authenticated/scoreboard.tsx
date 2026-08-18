@@ -62,7 +62,7 @@ function Scoreboard() {
       const cur = map.get(b.student_id);
       if (!cur) return;
       cur.points += b.points;
-      if (b.type === "positive") cur.pos += 1;
+      if (b.type === "Positive") cur.pos += 1;
       else cur.neg += 1;
     });
     return (students ?? [])
