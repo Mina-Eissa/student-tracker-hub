@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, DoorOpen, Minus, Plus, Square, Timer } from "lucide-react";
 import { toast } from "sonner";
-import { api } from "@/api";
+import { api, type BehaviorTag } from "@/api";
 import { fmtClock, fmtDuration, fmtTime, todayISO } from "@/lib/format";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -293,8 +293,8 @@ function SessionPage() {
                 {(behaviors ?? []).map((b) => (
                   <li key={b.id} className="text-xs">
                     <div className="flex items-center gap-2">
-                      <Badge variant={b.type === "positive" ? "default" : "destructive"}>
-                        {(tags ?? []).find((t) => t.id === b.tag_id)?.name ?? b.type}
+                      <Badge variant={b.type === "Positive" ? "default" : "destructive"}>
+                        {(tags ?? []).find((t) => t.id === b.tag_id)?.tag ?? b.type}
                       </Badge>
                       <span className="tabular-nums text-muted-foreground">
                         {b.points > 0 ? `+${b.points}` : b.points}
@@ -518,7 +518,7 @@ function ReasonDialog({
   );
 }
 
-type Tag = { id: string; name: string; type: string; points: number };
+type Tag = BehaviorTag;
 
 function BehaviorDialog({
   student,
@@ -548,8 +548,8 @@ function BehaviorDialog({
         session_id: sessionId,
         session_date: date,
         tag_id: tag.id,
-        type: tag.type as "positive" | "negative",
-        points: tag.points,
+        type: tag.type,
+        points: tag.point,
         comment: comment.trim() || null,
         consequence: consequence.trim() || null,
       });
@@ -578,7 +578,7 @@ function BehaviorDialog({
             <Label className="mb-2 block">Positive</Label>
             <div className="flex flex-wrap gap-2">
               {tags
-                .filter((t) => t.type === "positive")
+                .filter((t) => t.type === "Positive")
                 .map((t) => (
                   <TagChip key={t.id} tag={t} active={t.id === tagId} onClick={() => setTagId(t.id)} />
                 ))}
@@ -588,7 +588,7 @@ function BehaviorDialog({
             <Label className="mb-2 block">Negative</Label>
             <div className="flex flex-wrap gap-2">
               {tags
-                .filter((t) => t.type === "negative")
+                .filter((t) => t.type === "Negative")
                 .map((t) => (
                   <TagChip key={t.id} tag={t} active={t.id === tagId} onClick={() => setTagId(t.id)} />
                 ))}
@@ -638,9 +638,9 @@ function TagChip({ tag, active, onClick }: { tag: Tag; active: boolean; onClick:
           : "border-border bg-background hover:bg-secondary"
       }`}
     >
-      {tag.points >= 0 ? <Plus className="size-3" /> : <Minus className="size-3" />}
-      {tag.name}
-      <span className="tabular-nums opacity-70">{Math.abs(tag.points)}</span>
+      {tag.point >= 0 ? <Plus className="size-3" /> : <Minus className="size-3" />}
+      {tag.tag}
+      <span className="tabular-nums opacity-70">{Math.abs(tag.point)}</span>
     </button>
   );
 }

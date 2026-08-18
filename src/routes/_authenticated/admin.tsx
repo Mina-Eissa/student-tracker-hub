@@ -324,16 +324,38 @@ function StudentsTab() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const uploadFile = useMutation({
-    mutationFn: async (file: File) => {
+  const [parsed, setParsed] = useState<{ name: string; rows: StudentInput[] } | null>(null);
+  const [fileError, setFileError] = useState("");
+
+  const pickFile = async (file: File) => {
+    setFileError("");
+    setParsed(null);
+    try {
       const rows = await parseRosterFile(file);
-      return api.students.bulkCreate(active, rows);
+      setParsed({ name: file.name, rows });
+      toast.success(`${rows.length} student(s) read from ${file.name}`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Could not read that file";
+      setFileError(msg);
+      toast.error(msg);
+    }
+  };
+
+  const uploadFile = useMutation({
+    mutationFn: async () => {
+      if (!parsed || parsed.rows.length === 0) throw new Error("Choose a file first");
+      if (!active) throw new Error("Select a grade first");
+      return api.students.bulkCreate(active, parsed.rows);
     },
     onSuccess: (n) => {
+      setParsed(null);
       toast.success(`${n} student(s) imported`);
       invalidate();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => {
+      setFileError(e.message);
+      toast.error(e.message);
+    },
   });
 
   const remove = useMutation({
@@ -401,18 +423,56 @@ function StudentsTab() {
             <Input
               id="rosterfile"
               type="file"
-              accept=".csv,.xlsx,.xls"
-              disabled={!active || uploadFile.isPending}
+              accept=".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+              disabled={uploadFile.isPending}
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 e.target.value = "";
-                if (file) uploadFile.mutate(file);
+                if (file) void pickFile(file);
               }}
             />
             <p className="text-xs text-muted-foreground">
               Columns: <code>First Name, Middle Name, Last Name, Student ID</code> — only the first
-              name is required.
+              name is required. A single <code>Name</code> column also works.
             </p>
+            {fileError && <p className="text-xs text-destructive">{fileError}</p>}
+            {parsed && (
+              <div className="space-y-2 rounded-md border border-border p-3">
+                <p className="text-xs text-muted-foreground">
+                  {parsed.rows.length} student(s) found in <strong>{parsed.name}</strong>
+                </p>
+                <ul className="max-h-32 overflow-y-auto text-xs">
+                  {parsed.rows.slice(0, 20).map((r, i) => (
+                    <li key={i} className="py-0.5">
+                      {[r.first_name, r.middle_name, r.last_name].filter(Boolean).join(" ")}
+                      {r.student_code && (
+                        <span className="ml-2 text-muted-foreground">{r.student_code}</span>
+                      )}
+                    </li>
+                  ))}
+                  {parsed.rows.length > 20 && (
+                    <li className="py-0.5 text-muted-foreground">
+                      +{parsed.rows.length - 20} more…
+                    </li>
+                  )}
+                </ul>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    disabled={!active || uploadFile.isPending}
+                    onClick={() => uploadFile.mutate()}
+                  >
+                    {uploadFile.isPending ? "Importing…" : `Import ${parsed.rows.length}`}
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setParsed(null)}>
+                    Cancel
+                  </Button>
+                </div>
+                {!active && (
+                  <p className="text-xs text-destructive">Select a grade above before importing.</p>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="mt-4 space-y-2 border-t border-border pt-4">
