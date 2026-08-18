@@ -324,16 +324,38 @@ function StudentsTab() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const uploadFile = useMutation({
-    mutationFn: async (file: File) => {
+  const [parsed, setParsed] = useState<{ name: string; rows: StudentInput[] } | null>(null);
+  const [fileError, setFileError] = useState("");
+
+  const pickFile = async (file: File) => {
+    setFileError("");
+    setParsed(null);
+    try {
       const rows = await parseRosterFile(file);
-      return api.students.bulkCreate(active, rows);
+      setParsed({ name: file.name, rows });
+      toast.success(`${rows.length} student(s) read from ${file.name}`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Could not read that file";
+      setFileError(msg);
+      toast.error(msg);
+    }
+  };
+
+  const uploadFile = useMutation({
+    mutationFn: async () => {
+      if (!parsed || parsed.rows.length === 0) throw new Error("Choose a file first");
+      if (!active) throw new Error("Select a grade first");
+      return api.students.bulkCreate(active, parsed.rows);
     },
     onSuccess: (n) => {
+      setParsed(null);
       toast.success(`${n} student(s) imported`);
       invalidate();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => {
+      setFileError(e.message);
+      toast.error(e.message);
+    },
   });
 
   const remove = useMutation({
