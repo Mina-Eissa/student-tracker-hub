@@ -55,10 +55,7 @@ function AdminPage() {
   }
 
   return (
-    <AppShell
-      title="Admin"
-      description="Users, grades, students, teachers and the timetable."
-    >
+    <AppShell title="Admin" description="Users, grades, students, teachers and the timetable.">
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="mb-4">
           <TabsTrigger value="users">Users</TabsTrigger>

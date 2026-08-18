@@ -91,7 +91,7 @@ export const ENDPOINTS = {
 
   // tracking
   attendance: "/attendance",
-  behaviorTags: "/behavior-tags",
+  behaviorTags: "/behavior-tags/",
   behaviorTag: (id: string) => `/behavior-tags/${id}`,
   behaviors: "/behaviors",
   bathroomLogs: "/bathroom-logs",

@@ -93,8 +93,8 @@ function AuthPage() {
     <div className="flex min-h-screen items-center justify-center bg-sidebar px-4 py-12">
       <div className="w-full max-w-md">
         <div className="mb-6 flex items-center justify-center gap-2 text-sidebar-foreground">
-          <ClipboardList className="size-6 text-sidebar-primary" />
-          <span className="text-lg font-semibold tracking-tight">ClassTrack</span>
+          <img src="/whitelogo.ico" alt="Logo"></img>
+          <span className="text-lg font-semibold tracking-tight">Student Tracker</span>
         </div>
         <Card>
           <CardHeader>
@@ -105,9 +105,9 @@ function AuthPage() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="signin">
-              <TabsList className="mb-4 grid w-full grid-cols-2">
+              <TabsList className="mb-4 grid w-full grid-cols-1">
                 <TabsTrigger value="signin">Sign in</TabsTrigger>
-                <TabsTrigger value="signup">Create account</TabsTrigger>
+                {/* <TabsTrigger value="signup">Create account</TabsTrigger> */}
               </TabsList>
               <TabsContent value="signin">
                 <form onSubmit={onSignIn} className="space-y-3">
@@ -136,7 +136,7 @@ function AuthPage() {
                   </Button>
                 </form>
               </TabsContent>
-              <TabsContent value="signup">
+              {/* <TabsContent value="signup">
                 <form onSubmit={onSignUp} className="space-y-3">
                   <div className="grid gap-3 sm:grid-cols-3">
                     <div className="space-y-1.5">
@@ -186,7 +186,7 @@ function AuthPage() {
                     Create teacher account
                   </Button>
                 </form>
-              </TabsContent>
+              </TabsContent> */}
             </Tabs>
 
             {/* {SOCIAL_AUTH.enabledProviders.length > 0 && (

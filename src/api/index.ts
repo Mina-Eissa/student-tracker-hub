@@ -9,7 +9,13 @@ import { usersApi } from "./users.api";
 import { gradesApi, studentsApi } from "./students.api";
 import { sessionsApi, teachersApi } from "./sessions.api";
 import { resetMockDb } from "./mock-db";
-import { attendanceApi, bathroomApi, behaviorTagsApi, behaviorsApi, scoreboardApi } from "./tracking.api";
+import {
+  attendanceApi,
+  bathroomApi,
+  behaviorTagsApi,
+  behaviorsApi,
+  scoreboardApi,
+} from "./tracking.api";
 
 export const api = {
   auth: authApi,

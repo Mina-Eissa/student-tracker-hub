@@ -2,7 +2,7 @@
 
 export type AppRole = "Admin" | "Teacher";
 export type AttendanceStatus = "present" | "absent" | "late" | "excused";
-export type BehaviorType = "positive" | "negative";
+export type BehaviorType = "Positive" | "Negative";
 
 /** Every person (user or student) is named this way: at least one part. */
 export interface PersonName {
@@ -78,9 +78,9 @@ export interface AttendanceRecord {
 
 export interface BehaviorTag {
   id: string;
-  name: string;
+  tag: string;
   type: BehaviorType;
-  points: number;
+  point: number;
 }
 
 export interface BehaviorRecord {

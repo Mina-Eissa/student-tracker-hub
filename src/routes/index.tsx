@@ -60,8 +60,8 @@ function Landing() {
     <div className="min-h-screen bg-background">
       <header className="flex items-center justify-between px-6 py-5">
         <div className="flex items-center gap-2">
-          <ClipboardList className="size-5 text-primary" />
-          <span className="font-semibold tracking-tight">ClassTrack</span>
+          <img src="/logo.ico" alt="Logo"></img>
+          <span className="font-semibold tracking-tight">Student Tracker</span>
         </div>
         <Button asChild size="sm">
           <Link to="/auth">Sign in</Link>

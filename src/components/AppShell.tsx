@@ -42,8 +42,8 @@ export function AppShell({
     <div className="flex min-h-screen bg-background">
       <aside className="no-print sticky top-0 hidden h-screen w-60 shrink-0 flex-col bg-sidebar p-4 text-sidebar-foreground md:flex">
         <div className="mb-6 flex items-center gap-2 px-2">
-          <ClipboardList className="size-5 text-sidebar-primary" />
-          <span className="text-sm font-semibold tracking-tight">ClassTrack</span>
+          <img src="/whitelogo.ico" alt="Logo"></img>
+          <span className="text-sm font-semibold tracking-tight">Student Tracker</span>
         </div>
         <nav className="flex flex-1 flex-col gap-1">
           {nav.map((item) => (
@@ -82,9 +82,7 @@ export function AppShell({
         <header className="no-print flex flex-wrap items-end justify-between gap-3 border-b border-border bg-card px-6 py-5">
           <div>
             <h1 className="text-xl font-semibold">{title}</h1>
-            {description && (
-              <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-            )}
+            {description && ( <p className="mt-1 text-sm text-muted-foreground">{description}</p>)}
           </div>
           <div className="flex items-center gap-2">{actions}</div>
         </header>

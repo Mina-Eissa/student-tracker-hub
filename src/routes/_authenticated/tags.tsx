@@ -56,13 +56,13 @@ function TagsPage() {
 
   const save = useMutation({
     mutationFn: async (t: Partial<Tag>) => {
-      const name = (t.name ?? "").trim();
-      if (!name) throw new Error("Tag name is required");
-      const type = (t.type ?? "positive") as "positive" | "negative";
-      const magnitude = Math.abs(Number(t.points ?? 1));
-      const points = type === "positive" ? magnitude : -magnitude;
-      if (t.id) await api.behaviorTags.update(t.id, { name, type, points });
-      else await api.behaviorTags.create({ name, type, points });
+      const tag = (t.tag ?? "").trim();
+      if (!tag) throw new Error("Tag is required");
+      const type = (t.type ?? "Positive") as "Positive" | "Negative";
+      const magnitude = Math.abs(Number(t.point ?? 1));
+      const point = type === "Positive" ? magnitude : -magnitude;
+      if (t.id) await api.behaviorTags.update(t.id, { tag, type, point });
+      else await api.behaviorTags.create({ tag, type, point });
     },
     onSuccess: () => {
       toast.success("Tag saved");
@@ -81,9 +81,9 @@ function TagsPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const groups: Array<["positive" | "negative", string]> = [
-    ["positive", "Positive tags"],
-    ["negative", "Negative tags"],
+  const groups: Array<["Positive" | "Negative", string]> = [
+    ["Positive", "Positive tags"],
+    ["Negative", "Negative tags"],
   ];
 
   return (
@@ -91,7 +91,7 @@ function TagsPage() {
       title="Behavior tags"
       description="Points from these tags feed straight into the scoreboard."
       actions={
-        <Button size="sm" onClick={() => setEditing({ type: "positive", points: 1 })}>
+        <Button size="sm" onClick={() => setEditing({ type: "Positive", point: 1 })}>
           <Plus className="size-3.5" /> New tag
         </Button>
       }
@@ -106,13 +106,13 @@ function TagsPage() {
                 .map((t) => (
                   <li key={t.id} className="flex items-center justify-between gap-3 px-4 py-3">
                     <div>
-                      <p className="text-sm font-medium">{t.name}</p>
+                      <p className="text-sm font-medium">{t.tag}</p>
                       <p
                         className={`text-xs tabular-nums ${
-                          t.points >= 0 ? "text-primary" : "text-destructive"
+                          t.point >= 0 ? "text-primary" : "text-destructive"
                         }`}
                       >
-                        {t.points > 0 ? `+${t.points}` : t.points} points
+                        {t.point > 0 ? `+${t.point}` : t.point} points
                       </p>
                     </div>
                     <div className="flex gap-1">
@@ -149,8 +149,8 @@ function TagsPage() {
               <Input
                 id="name"
                 maxLength={60}
-                value={editing?.name ?? ""}
-                onChange={(e) => setEditing((p) => ({ ...p, name: e.target.value }))}
+                value={editing?.tag ?? ""}
+                onChange={(e) => setEditing((p) => ({ ...p, tag: e.target.value }))}
                 placeholder="Helpful, Noisy, Active…"
               />
             </div>
@@ -158,17 +158,17 @@ function TagsPage() {
               <div className="space-y-1.5">
                 <Label>Type</Label>
                 <Select
-                  value={editing?.type ?? "positive"}
+                  value={editing?.type ?? "Positive"}
                   onValueChange={(v) =>
-                    setEditing((p) => ({ ...p, type: v as "positive" | "negative" }))
+                    setEditing((p) => ({ ...p, type: v as "Positive" | "Negative" }))
                   }
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="positive">Positive</SelectItem>
-                    <SelectItem value="negative">Negative</SelectItem>
+                    <SelectItem value="Positive">Positive</SelectItem>
+                    <SelectItem value="Negative">Negative</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -179,8 +179,8 @@ function TagsPage() {
                   type="number"
                   min={0}
                   max={100}
-                  value={Math.abs(Number(editing?.points ?? 1))}
-                  onChange={(e) => setEditing((p) => ({ ...p, points: Number(e.target.value) }))}
+                  value={Math.abs(Number(editing?.point ?? 1))}
+                  onChange={(e) => setEditing((p) => ({ ...p, point: Number(e.target.value) }))}
                 />
               </div>
             </div>

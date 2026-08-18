@@ -47,9 +47,9 @@ export const attendanceApi = {
 export const behaviorTagsApi = {
   list: async (): Promise<BehaviorTag[]> => {
     if (!USE_MOCK) return http(ENDPOINTS.behaviorTags);
-    return delay([...db().behaviorTags].sort((a, b) => a.name.localeCompare(b.name)));
+    return delay([...db().behaviorTags].sort((a, b) => a.tag.localeCompare(b.tag)));
   },
-  create: async (input: { name: string; type: BehaviorType; points: number }): Promise<void> => {
+  create: async (input: { tag: string; type: BehaviorType; point: number }): Promise<void> => {
     if (!USE_MOCK) return http(ENDPOINTS.behaviorTags, { method: "POST", body: input });
     db().behaviorTags.push({ id: uid(), ...input });
     save();
