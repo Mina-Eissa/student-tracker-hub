@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, DoorOpen, Minus, Plus, Square, Timer } from "lucide-react";
 import { toast } from "sonner";
-import { api } from "@/api";
+import { api, type BehaviorTag } from "@/api";
 import { fmtClock, fmtDuration, fmtTime, todayISO } from "@/lib/format";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
