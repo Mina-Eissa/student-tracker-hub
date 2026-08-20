@@ -21,7 +21,7 @@ export const teachersApi = {
     if (!USE_MOCK)
       return http(ENDPOINTS.teacherGrades, {
         method: "POST",
-        body: { teacher_id: teacherId, grade_id: gradeId },
+        body: { teacher: teacherId, grade: gradeId },
       });
     db().teacherGrades.push({ id: uid(), teacher_id: teacherId, grade_id: gradeId });
     save();

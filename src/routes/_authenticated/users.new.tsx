@@ -42,7 +42,7 @@ function NewUserPage() {
     middle_name: "",
     last_name: "",
     email: "",
-    role: "teacher" as AppRole,
+    role: "Teacher" as AppRole,
     setPassword: false,
     password: "",
   });
@@ -143,8 +143,8 @@ function NewUserPage() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="teacher">Teacher</SelectItem>
-              <SelectItem value="admin">Admin</SelectItem>
+              <SelectItem value="Teacher">Teacher</SelectItem>
+              <SelectItem value="Admin">Admin</SelectItem>
             </SelectContent>
           </Select>
         </div>

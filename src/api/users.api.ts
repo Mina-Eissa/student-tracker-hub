@@ -24,7 +24,7 @@ export const usersApi = {
   create: async (input: CreateUserInput): Promise<UserRecord> => {
     if (!input.first_name.trim()) throw new ApiError("First name is required");
     if (!input.email.trim()) throw new ApiError("Email is required");
-    if (!USE_MOCK) return http(ENDPOINTS.users, { method: "POST", body: input });
+    if (!USE_MOCK) return http(ENDPOINTS.usersCreate, { method: "POST", body: input });
 
     const store = db();
     if (store.users.some((u) => u.email.toLowerCase() === input.email.toLowerCase())) {

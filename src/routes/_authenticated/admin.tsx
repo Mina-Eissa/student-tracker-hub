@@ -178,7 +178,7 @@ function GradesTab({ onPickGrade }: { onPickGrade: (id: string) => void }) {
   const name = `Grade ${level}${section}`;
 
   const create = useMutation({
-    mutationFn: () => api.grades.create(name),
+    mutationFn: () => api.grades.create(level, section),
     onSuccess: () => {
       toast.success(`${name} added`);
       qc.invalidateQueries({ queryKey: ["grades"] });
@@ -255,7 +255,7 @@ function GradesTab({ onPickGrade }: { onPickGrade: (id: string) => void }) {
                 onClick={() => onPickGrade(g.id)}
                 className="flex-1 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-accent hover:text-accent-foreground"
               >
-                {g.name}
+                Grade {g.level}{g.section}
               </button>
               <Button size="icon" variant="ghost" onClick={() => remove.mutate(g.id)}>
                 <Trash2 className="size-4 text-destructive" />
@@ -377,7 +377,7 @@ function StudentsTab() {
           <SelectContent>
             {(grades ?? []).map((g) => (
               <SelectItem key={g.id} value={g.id}>
-                {g.name}
+                Grade {g.level}{g.section}
               </SelectItem>
             ))}
           </SelectContent>
@@ -575,7 +575,7 @@ function TeachersTab() {
             <SelectContent>
               {(grades ?? []).map((g) => (
                 <SelectItem key={g.id} value={g.id}>
-                  {g.name}
+                  Grade {g.level}{g.section}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -699,7 +699,7 @@ function SessionsTab({ gradeId }: { gradeId?: string }) {
               <SelectContent>
                 {(grades ?? []).map((g) => (
                   <SelectItem key={g.id} value={g.id}>
-                    {g.name}
+                    Grade {g.level}{g.section}
                   </SelectItem>
                 ))}
               </SelectContent>

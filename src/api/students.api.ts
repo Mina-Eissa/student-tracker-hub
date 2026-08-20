@@ -6,13 +6,13 @@ import { fullName, type Grade, type PersonName, type Student } from "./types";
 export const gradesApi = {
   list: async (): Promise<Grade[]> => {
     if (!USE_MOCK) return http(ENDPOINTS.grades);
-    return delay([...db().grades].sort((a, b) => a.name.localeCompare(b.name)));
+    return delay([...db().grades].sort((a, b) => a.level.localeCompare(b.level)));
   },
-  create: async (name: string): Promise<void> => {
-    const value = name.trim();
+  create: async (level: string, section: string): Promise<void> => {
+    const value = level && section ? `${level} - ${section}` : undefined;
     if (!value) throw new ApiError("Grade name is required");
-    if (!USE_MOCK) return http(ENDPOINTS.grades, { method: "POST", body: { name: value } });
-    db().grades.push({ id: uid(), name: value });
+    if (!USE_MOCK) return http(ENDPOINTS.grades, { method: "POST", body: { level, section } });
+    db().grades.push({ id: uid(), level, section });
     save();
   },
   remove: async (id: string): Promise<void> => {

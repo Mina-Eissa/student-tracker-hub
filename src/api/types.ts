@@ -34,7 +34,8 @@ export interface UserRecord extends PersonName {
 
 export interface Grade {
   id: string;
-  name: string;
+  level: string;
+  section: string;
 }
 
 export interface Student extends PersonName {

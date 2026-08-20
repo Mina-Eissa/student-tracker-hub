@@ -74,30 +74,31 @@ export const ENDPOINTS = {
   social: (provider: string) => `/auth/social/${provider}`,
 
   // users (admin)
-  users: "/users",
+  users: "/users/",
+  usersCreate: "/users/create/",
   user: (id: string) => `/users/${id}`,
 
   // school data
-  grades: "/grades",
+  grades: "/grades/",
   grade: (id: string) => `/grades/${id}`,
-  students: "/students",
+  students: "/students/",
   student: (id: string) => `/students/${id}`,
   studentsBulk: "/students/bulk",
-  teachers: "/teachers",
-  teacherGrades: "/teacher-grades",
+  teachers: "/teachers/",
+  teacherGrades: "/teacher-grades/",
   teacherGrade: (id: string) => `/teacher-grades/${id}`,
-  sessions: "/sessions",
+  sessions: "/sessions/",
   session: (id: string) => `/sessions/${id}`,
 
   // tracking
-  attendance: "/attendance",
+  attendance: "/attendance/",
   behaviorTags: "/behavior-tags/",
   behaviorTag: (id: string) => `/behavior-tags/${id}`,
-  behaviors: "/behaviors",
-  bathroomLogs: "/bathroom-logs",
+  behaviors: "/behaviors/",
+  bathroomLogs: "/bathroom-logs/",
   /** PATCH: student came back — body { returned_at, duration_seconds, duration_minutes } */
   bathroomLogReturn: (id: string) => `/bathroom-logs/${id}/return`,
   bathroomLog: (id: string) => `/bathroom-logs/${id}`,
-  scoreboard: "/scoreboard",
-  report: "/reports/session",
+  scoreboard: "/scoreboard/",
+  report: "/reports/session/",
 } as const;
